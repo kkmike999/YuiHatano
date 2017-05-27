@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrayName">
+        <item>item0</item>
+        <item>item1</item>
+    </string-array>
+
+    <integer-array name="intArray">
+        <item>0</item>
+        <item>1</item>
+    </integer-array>
+
+    <integer-array name="intArrayNoItem">
+    </integer-array>
+</resources>
