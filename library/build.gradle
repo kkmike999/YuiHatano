@@ -27,10 +27,6 @@ dependencies {
     compile 'org.mockito:mockito-all:2.0.2-beta'
     compile 'junit:junit:4.12'
     compile 'org.json:org.json:2.0'
-    //    compile "org.powermock:powermock-module-junit4:1.6.4"
-    //    compile "org.powermock:powermock-module-junit4-rule:1.6.4"
-    //    compile "org.powermock:powermock-api-mockito:1.6.4"
-    //    compile "org.powermock:powermock-classloading-xstream:1.6.4"
     compile 'net.javacrumbs.json-unit:json-unit:1.16.0'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
 
@@ -41,4 +37,6 @@ dependencies {
         exclude module: 'mockito-core', group: 'org.mockito'
         exclude module: 'support-annotations', group: 'com.android.support'
     }
+
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.16.1'
 }

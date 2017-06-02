@@ -20,6 +20,19 @@ public class ReflectUtils {
         return null;
     }
 
+    public static Object invoke(Object receiver, String methodName) {
+        try {
+            Class clazz = receiver.getClass();
+
+            Method method = findMethod(clazz, methodName, new Class[0]);
+
+            return method.invoke(receiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Method findMethod(Class clazz, String methodName, Class[] argumentTypes) {
         while (!clazz.equals(Object.class)) {
             Method[] ms = clazz.getDeclaredMethods();
