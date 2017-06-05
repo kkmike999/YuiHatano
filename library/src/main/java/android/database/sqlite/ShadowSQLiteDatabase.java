@@ -25,7 +25,6 @@ import android.database.DatabaseErrorHandler;
 import android.database.DefaultDatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.ShadowDatabaseUtils;
-import android.database.SqlBuilder;
 import android.database.sqlite.SQLiteDebug.DbStats;
 import android.os.Build;
 import android.os.CancellationSignal;
@@ -1343,10 +1342,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                                       String editTable, CancellationSignal cancellationSignal) {
         acquireReference();
         try {
-            // TODO: 17/6/1
-//            SQLiteCursorDriver driver = new SQLiteDirectCursorDriver(this, sql, editTable, cancellationSignal);
-//            return driver.query(cursorFactory != null ? cursorFactory : mCursorFactory, selectionArgs);
-            return null;
+            ShadowSQLiteDirectCursorDriver driver = new ShadowSQLiteDirectCursorDriver(this, sql, editTable, cancellationSignal);
+            return driver.query(cursorFactory != null ? cursorFactory : mCursorFactory, selectionArgs);
         } finally {
             releaseReference();
         }
@@ -1530,7 +1527,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                     }
                     valuesSql.append(')');
 
-                    String valuesStr = SqlBuilder.sql(valuesSql.toString(), bindArgs);
+                    String valuesStr = KbSqlBuilder.sql(valuesSql.toString(), bindArgs);
 
                     sql.append(valuesStr);
                 }
@@ -1603,7 +1600,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             long beforeCount = getRows(table);
 
             // 处理where语句
-            String afterWhere = SqlBuilder.sql(whereClause, (Object[]) whereArgs);
+            String afterWhere = KbSqlBuilder.sql(whereClause, (Object[]) whereArgs);
             String sql        = "DELETE FROM " + table + (!TextUtils.isEmpty(afterWhere) ? " WHERE " + afterWhere : "");
 
             debug(sql);
@@ -1680,7 +1677,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             if (!TextUtils.isEmpty(whereClause)) {
                 sql.append(" WHERE ");
 
-                String afterWhere = SqlBuilder.sql(whereClause, whereArgs);
+                String afterWhere = KbSqlBuilder.sql(whereClause, whereArgs);
 
                 sql.append(afterWhere);
             }
@@ -1788,7 +1785,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             }
 
             // TODO: 17/6/2 不够严谨，如果字段里包含'?'
-            String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : SqlBuilder.sql(sql, bindArgs);
+            String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : KbSqlBuilder.sql(sql, bindArgs);
 
             Statement statement = mConnection.createStatement();
             statement.execute(afterSql);
@@ -2139,6 +2136,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         }
     }
 
+    public Connection getConnection() {
+        return mConnection;
+    }
+
     /**
      * Collect statistics about all open databases in the current process.
      * Used by bug report.
@@ -2314,9 +2315,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     public interface CursorFactory {
 
-        public Cursor newCursor(ShadowSQLiteDatabase db,
-                                SQLiteCursorDriver masterQuery, String editTable,
-                                ShadowSQLiteQuery query);
+        Cursor newCursor(ShadowSQLiteDatabase db,
+                         ShadowSQLiteDirectCursorDriver masterQuery, String editTable,
+                         ShadowSQLiteQuery query);
     }
 
     /**
@@ -2327,6 +2328,6 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @hide
      */
     public interface CustomFunction {
-        public void callback(String[] args);
+        void callback(String[] args);
     }
 }

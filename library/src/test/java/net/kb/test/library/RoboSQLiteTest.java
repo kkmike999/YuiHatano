@@ -1,14 +1,20 @@
 package net.kb.test.library;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kkmike999 on 2017/06/01.
@@ -64,5 +70,63 @@ public class RoboSQLiteTest {
         int row = db.update("person", cv, "name=?", new String[]{"leo"});
 
         System.out.println("影响行数 row=" + row);
+    }
+
+    @Test
+    public void testSelect() throws SQLException {
+        testInsert();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM person WHERE name=?", new String[]{"leo"});
+
+        int count = cursor.getCount();
+
+        List<Person> persons = getPersons(cursor);
+
+        Assert.assertEquals(count, persons.size());
+
+        System.out.println(persons.toString());
+    }
+
+    @Test
+    public void testSelectCondition() {
+//        testInsert();
+        testCreateTable();
+
+        // 插入数据
+        {
+            ContentValues cv = new ContentValues();
+            cv.put("id", 1);
+            cv.put("name", "leo");
+
+            db.insert("person", null, cv);
+
+            cv.put("name", "leo1");
+            db.insert("person", null, cv);
+        }
+
+//        Cursor cursor = db.rawQuery("SELECT * FROM person WHERE name BETWEEN 'leo' AND 'leo1'", null);
+//        Cursor cursor = db.rawQuery("SELECT * FROM person WHERE name BETWEEN ? AND ?", new String[]{"leo", "leo1"});
+        Cursor cursor = db.rawQuery("SELECT * FROM person WHERE name in (?,?)", new String[]{"leo", "leo1"});
+
+        int count = cursor.getCount();
+
+        List<Person> persons = getPersons(cursor);
+
+        System.out.println(persons.toString());
+    }
+
+    private List<Person> getPersons(Cursor cursor) {
+        List<Person> persons = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            int    id   = cursor.getInt(cursor.getColumnIndex("id"));
+            String name = cursor.getString(cursor.getColumnIndex("name"));
+
+            persons.add(new Person(id, name));
+        }
+
+        cursor.close();
+
+        return persons;
     }
 }

@@ -1,14 +1,18 @@
 package net.kb.test.library;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.ShadowSQLiteDatabase;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kkmike999 on 2017/06/01.
@@ -72,5 +76,29 @@ public class SQLiteTest {
         int row = db.update("person", cv, "name=?", new String[]{"leo"});
 
         System.out.println("影响行数 row=" + row);
+    }
+
+    @Test
+    public void testSelect() throws SQLException {
+        testInsert();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM person WHERE name=?", new String[]{"leo"});
+
+        int count = cursor.getCount();
+
+        List<Person> persons = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            int    id   = cursor.getInt(cursor.getColumnIndex("id"));
+            String name = cursor.getString(cursor.getColumnIndex("name"));
+
+            persons.add(new Person(id, name));
+        }
+
+        Assert.assertEquals(count, persons.size());
+
+        System.out.println(persons.toString());
+
+        cursor.close();
     }
 }

@@ -61,7 +61,7 @@ public abstract class ShadowSQLiteProgram extends SQLiteClosable {
                 mReadOnly = info.readOnly;
                 mColumnNames = info.columnNames;
 //                mNumParameters = info.numParameters;
-                mNumParameters = bindArgs.length;
+                mNumParameters = bindArgs == null ? 0 : bindArgs.length;
                 break;
         }
 

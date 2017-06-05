@@ -39,4 +39,5 @@ dependencies {
     }
 
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.16.1'
+    compile group: 'com.github.jsqlparser', name: 'jsqlparser', version: '1.0'
 }

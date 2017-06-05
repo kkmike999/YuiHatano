@@ -33,8 +33,8 @@ public final class ShadowSQLiteQuery extends ShadowSQLiteProgram {
 
     private final CancellationSignal mCancellationSignal;
 
-    public ShadowSQLiteQuery(ShadowSQLiteDatabase db, String query, CancellationSignal cancellationSignal) {
-        super(db, query, null, cancellationSignal);
+    public ShadowSQLiteQuery(ShadowSQLiteDatabase db, String query, Object[] bindArgs, CancellationSignal cancellationSignal) {
+        super(db, query, bindArgs, cancellationSignal);
 
         mCancellationSignal = cancellationSignal;
     }
@@ -42,16 +42,15 @@ public final class ShadowSQLiteQuery extends ShadowSQLiteProgram {
     /**
      * Reads rows into a buffer.
      *
-     * @param window The window to fill into
-     * @param startPos The start position for filling the window.
-     * @param requiredPos The position of a row that MUST be in the window.
-     * If it won't fit, then the query should discard part of what it filled.
+     * @param window       The window to fill into
+     * @param startPos     The start position for filling the window.
+     * @param requiredPos  The position of a row that MUST be in the window.
+     *                     If it won't fit, then the query should discard part of what it filled.
      * @param countAllRows True to count all rows that the query would
-     * return regardless of whether they fit in the window.
+     *                     return regardless of whether they fit in the window.
      * @return Number of rows that were enumerated.  Might not be all rows
      * unless countAllRows is true.
-     *
-     * @throws SQLiteException if an error occurs.
+     * @throws SQLiteException            if an error occurs.
      * @throws OperationCanceledException if the operation was canceled.
      */
     int fillWindow(CursorWindow window, int startPos, int requiredPos, boolean countAllRows) {

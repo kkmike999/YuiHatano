@@ -1,5 +1,6 @@
-package android.database;
+package android.database.sqlite;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  * <p>
  * sql语句工具类
  */
-public class SqlBuilder {
+class KbSqlBuilder {
 
     /**
      * 拼接sql语句
@@ -115,5 +116,37 @@ public class SqlBuilder {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * 替换字符串元素。例如，SELECT * FROM person WHERE name='leo' => SELECT * FROM person WHERE name='...'，返回['leo']
+     *
+     * @param sql
+     * @return
+     */
+    public List<String> replaceStringElement(String sql) {
+        StringBuilder sb = new StringBuilder(sql);
+
+//        List<>
+//
+//        for (int i = 0; i < sb.length(); i++) {
+//            char c = sb.charAt(i);
+//
+//            if (c == '\'') {
+//
+//            }
+//        }
+
+        return new ArrayList<>();
+    }
+
+    private class CharSequenceRange {
+        int start;
+        int end;
+
+        public CharSequenceRange(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
     }
 }
