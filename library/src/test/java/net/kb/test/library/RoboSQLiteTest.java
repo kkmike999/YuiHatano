@@ -115,6 +115,29 @@ public class RoboSQLiteTest {
         System.out.println(persons.toString());
     }
 
+    @Test
+    public void testQuery() {
+        testCreateTable();
+
+        // 插入数据
+        {
+            ContentValues cv = new ContentValues();
+            cv.put("id", 1);
+            cv.put("name", "leo");
+
+            db.insert("person", null, cv);
+
+            cv.put("name", "leo1");
+            db.insert("person", null, cv);
+        }
+
+        Cursor cursor = db.query(true, "person", new String[]{"id", "name"}, "(id BETWEEN ? and ?) and name LIKE ?", new String[]{"1", "2", "leo%"}, "", "", "id", "10");
+
+        List<Person> persons = getPersons(cursor);
+
+        System.out.println(persons.toString());
+    }
+
     private List<Person> getPersons(Cursor cursor) {
         List<Person> persons = new ArrayList<>();
 

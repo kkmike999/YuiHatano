@@ -1,7 +1,5 @@
 package net.kb.test.library.utils;
 
-import android.os.Build;
-
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -17,9 +15,6 @@ public class IOUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        if (Build.VERSION.SDK_INT >= 19) {
-            return;
         }
         try {
             closeable.close();

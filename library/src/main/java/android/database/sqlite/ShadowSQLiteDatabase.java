@@ -16,8 +16,6 @@
 
 package android.database.sqlite;
 
-import android.annotation.NonNull;
-import android.annotation.Nullable;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -25,11 +23,12 @@ import android.database.DatabaseErrorHandler;
 import android.database.DefaultDatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.ShadowDatabaseUtils;
-import android.database.sqlite.SQLiteDebug.DbStats;
 import android.os.Build;
 import android.os.CancellationSignal;
 import android.os.Looper;
 import android.os.OperationCanceledException;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.EventLog;
 import android.util.Log;
@@ -49,8 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import dalvik.system.CloseGuard;
 
 /**
  * Exposes methods to manage a SQLite database.
@@ -102,7 +99,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
     private final Object mLock = new Object();
 
-    private final CloseGuard mCloseGuardLocked = CloseGuard.get();
+//    private final CloseGuard mCloseGuardLocked = CloseGuard.get();
 
     private final SQLiteDatabaseConfiguration mConfigurationLocked;
 
@@ -278,39 +275,39 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     }
 
     private void dispose(boolean finalized) {
-        final SQLiteConnectionPool pool;
-        synchronized (mLock) {
-            if (mCloseGuardLocked != null) {
-                if (finalized) {
-                    mCloseGuardLocked.warnIfOpen();
-                }
-                mCloseGuardLocked.close();
-            }
-
-            pool = mConnectionPoolLocked;
-            mConnectionPoolLocked = null;
-        }
-
-        if (!finalized) {
-            synchronized (sActiveDatabases) {
-                sActiveDatabases.remove(this);
-            }
-
-            if (pool != null) {
-                pool.close();
-            }
-        }
+//        final SQLiteConnectionPool pool;
+//        synchronized (mLock) {
+//            if (mCloseGuardLocked != null) {
+//                if (finalized) {
+//                    mCloseGuardLocked.warnIfOpen();
+//                }
+//                mCloseGuardLocked.close();
+//            }
+//
+//            pool = mConnectionPoolLocked;
+//            mConnectionPoolLocked = null;
+//        }
+//
+//        if (!finalized) {
+//            synchronized (sActiveDatabases) {
+//                sActiveDatabases.remove(this);
+//            }
+//
+//            if (pool != null) {
+//                pool.close();
+//            }
+//        }
     }
 
-    /**
-     * Attempts to release memory that SQLite holds but does not require to
-     * operate properly. Typically this memory will come from the page cache.
-     *
-     * @return the number of bytes actually released
-     */
-    public static int releaseMemory() {
-        return SQLiteGlobal.releaseMemory();
-    }
+//    /**
+//     * Attempts to release memory that SQLite holds but does not require to
+//     * operate properly. Typically this memory will come from the page cache.
+//     *
+//     * @return the number of bytes actually released
+//     */
+//    public static int releaseMemory() {
+//        return SQLiteGlobal.releaseMemory();
+//    }
 
     /**
      * Control whether or not the ShadowSQLiteDatabase is made thread-safe by using locks
@@ -366,12 +363,13 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     }
 
     ShadowSQLiteSession createSession() {
-        final SQLiteConnectionPool pool;
-        synchronized (mLock) {
-            throwIfNotOpenLocked();
-            pool = mConnectionPoolLocked;
-        }
-        return new ShadowSQLiteSession(pool);
+//        final SQLiteConnectionPool pool;
+//        synchronized (mLock) {
+//            throwIfNotOpenLocked();
+//            pool = mConnectionPoolLocked;
+//        }
+//        return new ShadowSQLiteSession(pool);
+        return null;
     }
 
     /**
@@ -792,15 +790,15 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                 return; // nothing to do
             }
 
-            // Reopen the database in read-write mode.
-            final int oldOpenFlags = mConfigurationLocked.openFlags;
-            mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags & ~OPEN_READ_MASK) | OPEN_READWRITE;
-            try {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
-            } catch (RuntimeException ex) {
-                mConfigurationLocked.openFlags = oldOpenFlags;
-                throw ex;
-            }
+//            // Reopen the database in read-write mode.
+//            final int oldOpenFlags = mConfigurationLocked.openFlags;
+//            mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags & ~OPEN_READ_MASK) | OPEN_READWRITE;
+//            try {
+//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+//            } catch (RuntimeException ex) {
+//                mConfigurationLocked.openFlags = oldOpenFlags;
+//                throw ex;
+//            }
         }
     }
 
@@ -834,8 +832,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     private void openInner() {
         synchronized (mLock) {
             assert mConnectionPoolLocked == null;
-            mConnectionPoolLocked = SQLiteConnectionPool.open(mConfigurationLocked);
-            mCloseGuardLocked.open("close");
+//            mConnectionPoolLocked = SQLiteConnectionPool.open(mConfigurationLocked);
+//            mCloseGuardLocked.open("close");
         }
 
         synchronized (sActiveDatabases) {
@@ -1896,7 +1894,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             final Locale oldLocale = mConfigurationLocked.locale;
             mConfigurationLocked.locale = locale;
             try {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                // TODO: 17/6/6  
+//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.locale = oldLocale;
                 throw ex;
@@ -1929,7 +1928,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             final int oldMaxSqlCacheSize = mConfigurationLocked.maxSqlCacheSize;
             mConfigurationLocked.maxSqlCacheSize = cacheSize;
             try {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                // TODO: 17/6/6
+//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.maxSqlCacheSize = oldMaxSqlCacheSize;
                 throw ex;
@@ -1975,7 +1975,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
             mConfigurationLocked.foreignKeyConstraintsEnabled = enable;
             try {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                // TODO: 17/6/6  
+//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.foreignKeyConstraintsEnabled = !enable;
                 throw ex;
@@ -2086,7 +2087,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
             mConfigurationLocked.openFlags |= ENABLE_WRITE_AHEAD_LOGGING;
             try {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                // TODO: 17/6/6  
+//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.openFlags &= ~ENABLE_WRITE_AHEAD_LOGGING;
                 throw ex;
@@ -2113,7 +2115,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
             mConfigurationLocked.openFlags &= ~ENABLE_WRITE_AHEAD_LOGGING;
             try {
-                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                // TODO: 17/6/6  
+//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.openFlags |= ENABLE_WRITE_AHEAD_LOGGING;
                 throw ex;
@@ -2140,25 +2143,25 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         return mConnection;
     }
 
-    /**
-     * Collect statistics about all open databases in the current process.
-     * Used by bug report.
-     */
-    static ArrayList<DbStats> getDbStats() {
-        ArrayList<DbStats> dbStatsList = new ArrayList<DbStats>();
-        for (ShadowSQLiteDatabase db : getActiveDatabases()) {
-            db.collectDbStats(dbStatsList);
-        }
-        return dbStatsList;
-    }
+//    /**
+//     * Collect statistics about all open databases in the current process.
+//     * Used by bug report.
+//     */
+//    static ArrayList<DbStats> getDbStats() {
+//        ArrayList<DbStats> dbStatsList = new ArrayList<DbStats>();
+//        for (ShadowSQLiteDatabase db : getActiveDatabases()) {
+//            db.collectDbStats(dbStatsList);
+//        }
+//        return dbStatsList;
+//    }
 
-    private void collectDbStats(ArrayList<DbStats> dbStatsList) {
-        synchronized (mLock) {
-            if (mConnectionPoolLocked != null) {
-                mConnectionPoolLocked.collectDbStats(dbStatsList);
-            }
-        }
-    }
+//    private void collectDbStats(ArrayList<DbStats> dbStatsList) {
+//        synchronized (mLock) {
+//            if (mConnectionPoolLocked != null) {
+//                mConnectionPoolLocked.collectDbStats(dbStatsList);
+//            }
+//        }
+//    }
 
     private static ArrayList<ShadowSQLiteDatabase> getActiveDatabases() {
         ArrayList<ShadowSQLiteDatabase> databases = new ArrayList<ShadowSQLiteDatabase>();
@@ -2182,7 +2185,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         synchronized (mLock) {
             if (mConnectionPoolLocked != null) {
                 printer.println("");
-                mConnectionPoolLocked.dump(printer, verbose);
+                // TODO: 17/6/6
+//                mConnectionPoolLocked.dump(printer, verbose);
             }
         }
     }
@@ -2304,7 +2308,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         }
     }
 
-    private void debug(CharSequence sql) {
+    protected void debug(CharSequence sql) {
         if (DEBUG) {
             System.out.println(sql);
         }

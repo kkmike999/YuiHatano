@@ -1,17 +1,19 @@
 package android.content;
 
-import android.content.res.ShadowResources;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+
+import net.kkmike.sptest.SharedPreferencesHelper;
 
 /**
  * Created by kkmike999 on 2017/05/26.
  */
 public class ShadowContext {
 
-    private ShadowResources resources;
+    private Resources resources;
 
-    public ShadowContext(ShadowResources resources) {
+    public ShadowContext(Resources resources) {
         this.resources = resources;
     }
 
@@ -20,8 +22,12 @@ public class ShadowContext {
         return getResources().getString(resId);
     }
 
-    public ShadowResources getResources() {
+    public Resources getResources() {
         return resources;
+    }
+
+    public SharedPreferences getSharedPreferences(String name, int mode) {
+        return SharedPreferencesHelper.getInstance(name);
     }
 
 //    public Context getApplicationContext() {

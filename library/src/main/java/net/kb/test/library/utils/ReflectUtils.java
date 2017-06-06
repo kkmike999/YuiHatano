@@ -1,11 +1,34 @@
 package net.kb.test.library.utils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
  * Created by kkmike999 on 2017/05/26.
  */
 public class ReflectUtils {
+
+    public static void setField(Object receiver, String fieldName, Object value) {
+        Class clazz = receiver.getClass();
+
+        while (!clazz.equals(Object.class)) {
+            Field[] fields = clazz.getDeclaredFields();
+
+            for (Field field : fields) {
+                if (field.getName().equals(fieldName)) {
+                    field.setAccessible(true);
+                    try {
+                        field.set(receiver, value);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+    }
 
     public static Object invoke(Object receiver, String methodName, Object[] arguments) {
         try {
@@ -39,6 +62,11 @@ public class ReflectUtils {
 
             for (Method m : ms) {
                 if (m.getName().equals(methodName) && m.getParameterTypes().length == argumentTypes.length) {
+
+                    // 没有参数
+                    if (argumentTypes.length == 0) {
+                        return m;
+                    }
 
                     Class[] paramTypes = m.getParameterTypes();
 

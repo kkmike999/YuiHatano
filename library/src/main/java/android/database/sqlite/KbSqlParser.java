@@ -6,6 +6,7 @@ import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -52,7 +53,11 @@ public class KbSqlParser {
     }
 
     protected static int replaceExpression(Expression expression, Object[] args, int position) {
-        if (expression instanceof EqualsTo) {
+        if (expression instanceof Parenthesis) {
+            // 有括号的块
+            Parenthesis parenthesis = (Parenthesis) expression;
+            return replaceExpression(parenthesis.getExpression(), args, position);
+        } else if (expression instanceof EqualsTo) {
             // =
             EqualsTo   equalsTo = (EqualsTo) expression;
             Expression rightExp = equalsTo.getRightExpression();

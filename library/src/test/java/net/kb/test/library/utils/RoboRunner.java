@@ -1,4 +1,4 @@
-package net.kb.test.library;
+package net.kb.test.library.utils;
 
 import android.os.Build;
 

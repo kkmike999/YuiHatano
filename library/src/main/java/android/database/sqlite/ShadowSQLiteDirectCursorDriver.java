@@ -31,6 +31,8 @@ public final class ShadowSQLiteDirectCursorDriver {
         try {
             String querySql = KbSqlParser.bindArgs(mSql, selectionArgs);
 
+            mDatabase.debug(querySql);
+
             Connection connection = mDatabase.getConnection();
             Statement  statement  = connection.createStatement();
 
@@ -82,7 +84,7 @@ public final class ShadowSQLiteDirectCursorDriver {
     }
 
     public void setBindArguments(String[] bindArgs) {
-        mQuery.bindAllArgsAsStrings(bindArgs);
+//        mQuery.bindAllArgsAsStrings(bindArgs);
     }
 
     public void cursorDeactivated() {
