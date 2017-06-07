@@ -25,7 +25,6 @@ import android.database.SQLException;
 import android.database.ShadowDatabaseUtils;
 import android.os.Build;
 import android.os.CancellationSignal;
-import android.os.Looper;
 import android.os.OperationCanceledException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -391,8 +390,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     private static boolean isMainThread() {
         // FIXME: There should be a better way to do this.
         // Would also be nice to have something that would work across Binder calls.
-        Looper looper = Looper.myLooper();
-        return looper != null && looper == Looper.getMainLooper();
+//        Looper looper = Looper.myLooper();
+//        return looper != null && looper == Looper.getMainLooper();
+        return true;
     }
 
     /**
@@ -552,7 +552,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public void setTransactionSuccessful() {
         acquireReference();
         try {
-            getThreadSession().setTransactionSuccessful();
+//            getThreadSession().setTransactionSuccessful();
+            endTransaction();// 自己写的
         } finally {
             releaseReference();
         }

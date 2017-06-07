@@ -60,6 +60,10 @@ public class CGLibProxy implements MethodInterceptor {
         // 找到realObject对象中，一模一样的方法
         Method method2 = ReflectUtils.findMethod(realObject.getClass(), method.getName(), paramTypes);
 
+        if (method2 == null) {
+            throw new RuntimeException("method \'" + realObject.getClass() + "." + method.getName() + "\' not found.");
+        }
+
         return method2.invoke(realObject, args);
     }
 }

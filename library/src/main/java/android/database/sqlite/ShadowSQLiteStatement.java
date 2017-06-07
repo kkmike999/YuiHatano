@@ -18,6 +18,11 @@ package android.database.sqlite;
 
 import android.os.ParcelFileDescriptor;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
  * Represents a statement that can be executed against a database.  The statement
  * cannot return multiple rows or columns, but single value (1 x 1) result sets
@@ -36,7 +41,7 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * CREATE / DROP table, view, trigger, index etc.
      *
      * @throws android.database.SQLException If the SQL string is invalid for
-     *         some reason
+     *                                       some reason
      */
     public void execute() {
         acquireReference();
@@ -56,7 +61,7 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      *
      * @return the number of rows affected by this SQL statement execution.
      * @throws android.database.SQLException If the SQL string is invalid for
-     *         some reason
+     *                                       some reason
      */
     public int executeUpdateDelete() {
         acquireReference();
@@ -76,9 +81,8 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * The SQL statement should be an INSERT for this to be a useful call.
      *
      * @return the row ID of the last row inserted, if this insert is successful. -1 otherwise.
-     *
      * @throws android.database.SQLException If the SQL string is invalid for
-     *         some reason
+     *                                       some reason
      */
     public long executeInsert() {
         acquireReference();
@@ -98,17 +102,32 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * For example, SELECT COUNT(*) FROM table;
      *
      * @return The result of the query.
-     *
      * @throws SQLiteDoneException if the query returns zero rows
      */
     public long simpleQueryForLong() {
         acquireReference();
         try {
-            return getSession().executeForLong(
-                    getSql(), getBindArgs(), getConnectionFlags(), null);
+            String   sql  = getSql();
+            Object[] args = getBindArgs();
+//            return getSession().executeForLong(
+//                    getSql(), getBindArgs(), getConnectionFlags(), null);
+
+            Connection connection = getDatabase().getConnection();
+            Statement  statement  = connection.createStatement();
+            ResultSet  rs         = statement.executeQuery(sql);
+
+            int columnIndex  = rs.findColumn("user_version");
+            int user_version = rs.getInt(columnIndex);
+
+            rs.close();
+            statement.close();
+
+            return user_version;
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } finally {
             releaseReference();
         }
@@ -119,7 +138,6 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * For example, SELECT COUNT(*) FROM table;
      *
      * @return The result of the query.
-     *
      * @throws SQLiteDoneException if the query returns zero rows
      */
     public String simpleQueryForString() {
@@ -139,8 +157,7 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * Executes a statement that returns a 1 by 1 table with a blob value.
      *
      * @return A read-only file descriptor for a copy of the blob value, or {@code null}
-     *         if the value is null or could not be read for some reason.
-     *
+     * if the value is null or could not be read for some reason.
      * @throws SQLiteDoneException if the query returns zero rows
      */
     public ParcelFileDescriptor simpleQueryForBlobFileDescriptor() {
