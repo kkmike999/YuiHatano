@@ -126,8 +126,8 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (java.sql.SQLException e) {
+            throw new android.database.SQLException(e.getMessage());
         } finally {
             releaseReference();
         }

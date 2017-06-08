@@ -25,7 +25,8 @@ public class KBSharedPrefCase {
     private Context       mContext;
     private ShadowContext mShadowContext;
 
-    private List<String> dbPaths = new ArrayList<>();
+    private List<String>         dbPaths = new ArrayList<>();
+    private List<SQLiteDatabase> dbs     = new ArrayList<>();
 
     @Rule
     public ExternalResource contextRule = new ExternalResource() {
@@ -45,6 +46,9 @@ public class KBSharedPrefCase {
 
         @Override
         protected void after() {
+            for (SQLiteDatabase db : dbs) {
+                db.close();
+            }
             for (String dbPath : dbPaths) {
                 new File(dbPath).delete();
             }
@@ -67,6 +71,8 @@ public class KBSharedPrefCase {
 
             ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
             SQLiteDatabase       db  = new CGLibProxy().getInstance(SQLiteDatabase.class, sdb);
+
+            dbs.add(db);
 
             return db;
         } catch (Exception e) {

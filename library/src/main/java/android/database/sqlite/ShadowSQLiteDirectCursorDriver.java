@@ -7,7 +7,6 @@ import android.os.CancellationSignal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +71,8 @@ public final class ShadowSQLiteDirectCursorDriver {
             return shadowCursor;
         } catch (RuntimeException ex) {
             throw ex;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (java.sql.SQLException e) {
+            throw new android.database.SQLException(e.getMessage());
         }
 
 //        mQuery = query;

@@ -5,12 +5,14 @@ package net.kb.test.bean;
  */
 public class Bean {
     int    id;
+    int    uid;
     String name;
 
     public Bean() {
     }
 
-    public Bean(String name) {
+    public Bean(int uid, String name) {
+        this.uid = uid;
         this.name = name;
     }
 
@@ -20,6 +22,14 @@ public class Bean {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getUid() {
+        return uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 
     public String getName() {

@@ -5,6 +5,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -64,6 +65,12 @@ public class CGLibProxy implements MethodInterceptor {
             throw new RuntimeException("method \'" + realObject.getClass() + "." + method.getName() + "\' not found.");
         }
 
-        return method2.invoke(realObject, args);
+        try {
+            return method2.invoke(realObject, args);
+        } catch (InvocationTargetException e) {
+            Throwable targetEx = e.getTargetException();
+
+            throw targetEx;
+        }
     }
 }

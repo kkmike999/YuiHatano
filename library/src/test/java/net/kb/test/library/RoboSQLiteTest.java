@@ -138,6 +138,23 @@ public class RoboSQLiteTest {
         System.out.println(persons.toString());
     }
 
+    @Test
+    public void testDropTable() {
+        testInsert();
+
+        Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type ='table'", null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                //添加异常捕获.忽略删除所有表时出现的异常:
+                //table sqlite_sequence may not be dropped
+                String table = cursor.getString(0);
+                db.execSQL("DROP TABLE " + table);
+            }
+            cursor.close();
+        }
+    }
+
     private List<Person> getPersons(Cursor cursor) {
         List<Person> persons = new ArrayList<>();
 

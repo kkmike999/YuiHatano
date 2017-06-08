@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class SQLiteTest {
 
     @After
     public void tearDown() throws Exception {
-        new File("build/sample.db").delete();
+//        new File("build/sample.db").delete();
     }
 
     @Test

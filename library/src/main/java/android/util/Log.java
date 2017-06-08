@@ -165,8 +165,12 @@ public class Log {
     public static final int LOG_ID_CRASH  = 4;
 
     /** @hide */
-    public static int println_native(int bufID,
-                                     int priority, String tag, String msg) {
+    public static int println_native(int bufID, int priority, String tag, String msg) {
+        if (tag.equals(ERROR)) {
+            System.err.println(msg);
+        } else {
+            System.out.println(msg);
+        }
         return 0;
     }
 
@@ -186,8 +190,7 @@ public class Log {
      *
      * @hide
      */
-    public static int printlns(int bufID, int priority, String tag, String msg,
-                               Throwable tr) {
+    public static int printlns(int bufID, int priority, String tag, String msg, Throwable tr) {
         ImmediateLogWriter logWriter = new ImmediateLogWriter(bufID, priority, tag);
         // Acceptable buffer size. Get the native buffer size, subtract two zero terminators,
         // and the length of the tag.
@@ -203,7 +206,11 @@ public class Log {
 //        LineBreakBufferedWriter lbbw = new LineBreakBufferedWriter(logWriter, bufferSize);
 //
 //        lbbw.println(msg);
-        System.out.println(msg);
+        if (tag.equals(ERROR)) {
+            System.err.println(msg);
+        } else {
+            System.out.println(msg);
+        }
 
         if (tr != null) {
             // This is to reduce the amount of log spew that apps do in the non-error
@@ -216,8 +223,7 @@ public class Log {
                 if (t instanceof DeadSystemException) {
 //                    lbbw.println("DeadSystemException: The system died; "
 //                            + "earlier logs will point to the root cause");
-                    System.out.println("DeadSystemException: The system died; "
-                            + "earlier logs will point to the root cause");
+                    System.out.println("DeadSystemException: The system died; earlier logs will point to the root cause");
                     break;
                 }
                 t = t.getCause();

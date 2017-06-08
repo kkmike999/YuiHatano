@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.os.Build;
+import android.util.Log;
 
 import net.kb.test.library.utils.ReflectUtils;
 
@@ -13,8 +14,9 @@ import net.kb.test.library.utils.ReflectUtils;
 public abstract class SQLiteOpenHelper {
 
     private static final String MY_TAG = "mytag";
+    private static final String TAG    = SQLiteOpenHelper.class.getSimpleName();
 
-    private static final String TAG = SQLiteOpenHelper.class.getSimpleName();
+    private static boolean DEBUG = false;
 
     private static final boolean DEBUG_STRICT_READONLY = false;
 
@@ -90,15 +92,14 @@ public abstract class SQLiteOpenHelper {
                         String path = mContext.getDatabasePath(mName).getPath();
                         db = SQLiteDatabase.openDatabase(path, mFactory, SQLiteDatabase.OPEN_READONLY, mErrorHandler);
                     } else {
-                        System.out.println("openOrCreateDatabase . mContext=" + mContext);
+                        debug("openOrCreateDatabase . mContext=" + mContext);
                         db = mContext.openOrCreateDatabase(mName, mEnableWriteAheadLogging ? Context.MODE_ENABLE_WRITE_AHEAD_LOGGING : 0, mFactory, mErrorHandler);
                     }
                 } catch (SQLiteException ex) {
                     if (writable) {
                         throw ex;
                     }
-//                    Log.e(TAG, "Couldn't open " + mName + " for writing (will try read-only):", ex);
-                    System.err.println("Couldn't open " + mName + " for writing (will try read-only):");
+                    Log.e(TAG, "Couldn't open " + mName + " for writing (will try read-only):", ex);
 
                     String path = mContext.getDatabasePath(mName).getPath();
 
@@ -108,7 +109,8 @@ public abstract class SQLiteOpenHelper {
 
             onConfigure(db);
 
-            System.out.println("db=" + db);
+            debug("db=" + db);
+
             final int version = db.getVersion();
             if (version != mNewVersion) {
                 if (db.isReadOnly()) {
@@ -136,8 +138,7 @@ public abstract class SQLiteOpenHelper {
             onOpen(db);
 
             if (db.isReadOnly()) {
-//                Log.w(TAG, "Opened " + mName + " in read-only mode");
-                System.out.println("Opened " + mName + " in read-only mode");
+                Log.w(TAG, "Opened " + mName + " in read-only mode");
             }
 
             mDatabase = db;
@@ -147,6 +148,12 @@ public abstract class SQLiteOpenHelper {
             if (db != null && db != mDatabase) {
                 db.close();
             }
+        }
+    }
+
+    private void debug(String msg) {
+        if (DEBUG) {
+            System.out.println(msg);
         }
     }
 

@@ -1,5 +1,7 @@
 package android.database.sqlite;
 
+import android.support.annotation.Nullable;
+
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -31,7 +33,11 @@ import java.util.List;
  */
 public class KbSqlParser {
 
-    public static String bindArgs(String sql, Object[] bindArgs) {
+    public static String bindArgs(String sql, @Nullable Object[] bindArgs) {
+        if (bindArgs == null || bindArgs.length == 0) {
+            return sql;
+        }
+
         CCJSqlParserManager pm = new CCJSqlParserManager();
 
         try {

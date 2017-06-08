@@ -255,6 +255,13 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         mConfigurationLocked = new SQLiteDatabaseConfiguration(path, openFlags);
         mErrorHandler = null;
 
+//        boolean exist = new File(path).exists();
+//        debug("is db " + path + " exist=" + exist);
+
+//        if (!exist) {
+//            new File(path).mkdir();
+//        }
+
         mConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
         mConnection.setAutoCommit(false);
     }
@@ -1767,7 +1774,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         executeSql(sql, bindArgs);
     }
 
-    private int executeSql(String sql, Object[] bindArgs) throws SQLException, java.sql.SQLException {
+    private int executeSql(String sql, Object[] bindArgs) throws SQLException {
         acquireReference();
         try {
             if (ShadowDatabaseUtils.getSqlStatementType(sql) == ShadowDatabaseUtils.STATEMENT_ATTACH) {
@@ -1783,17 +1790,23 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                 }
             }
 
-            // TODO: 17/6/2 不够严谨，如果字段里包含'?'
+            // TODO: 17/6/8 估计有bug
             String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : KbSqlBuilder.sql(sql, bindArgs);
 
-            Statement statement = mConnection.createStatement();
-            statement.execute(afterSql);
+            debug(afterSql);
 
-            if (!isTransaction) {
-                mConnection.commit();
+            try {
+                Statement statement = mConnection.createStatement();
+                statement.execute(afterSql);
+
+                if (!isTransaction) {
+                    mConnection.commit();
+                }
+
+                statement.close();
+            } catch (java.sql.SQLException e) {
+                throw new android.database.SQLException("", e);
             }
-
-            statement.close();
 
             return 0;
         } finally {
