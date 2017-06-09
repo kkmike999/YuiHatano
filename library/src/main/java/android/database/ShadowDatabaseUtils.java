@@ -21,12 +21,14 @@ import android.content.ContentValues;
 import android.content.OperationApplicationException;
 import android.database.sqlite.SQLiteAbortException;
 import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteFullException;
+import android.database.sqlite.SQLiteProgram;
+import android.database.sqlite.SQLiteStatement;
 import android.database.sqlite.ShadowSQLiteDatabase;
-import android.database.sqlite.ShadowSQLiteProgram;
 import android.database.sqlite.ShadowSQLiteStatement;
 import android.os.Build;
 import android.os.OperationCanceledException;
@@ -203,7 +205,7 @@ public class ShadowDatabaseUtils {
      * @param index the 1-based index to bind at
      * @param value the value to bind
      */
-    public static void bindObjectToProgram(ShadowSQLiteProgram prog, int index, Object value) {
+    public static void bindObjectToProgram(SQLiteProgram prog, int index, Object value) {
         if (value == null) {
             prog.bindNull(index);
         } else if (value instanceof Double || value instanceof Float) {
@@ -843,7 +845,7 @@ public class ShadowDatabaseUtils {
      * first column of the first row.
      */
     public static long longForQuery(ShadowSQLiteDatabase db, String query, String[] selectionArgs) {
-        ShadowSQLiteStatement prog = db.compileStatement(query);
+        SQLiteStatement prog = db.compileStatement(query);
         try {
             return longForQuery(prog, selectionArgs);
         } finally {
@@ -855,7 +857,7 @@ public class ShadowDatabaseUtils {
      * Utility method to run the pre-compiled query and return the value in the
      * first column of the first row.
      */
-    public static long longForQuery(ShadowSQLiteStatement prog, String[] selectionArgs) {
+    public static long longForQuery(SQLiteStatement prog, String[] selectionArgs) {
         prog.bindAllArgsAsStrings(selectionArgs);
         return prog.simpleQueryForLong();
     }
@@ -864,8 +866,8 @@ public class ShadowDatabaseUtils {
      * Utility method to run the query on the db and return the value in the
      * first column of the first row.
      */
-    public static String stringForQuery(ShadowSQLiteDatabase db, String query, String[] selectionArgs) {
-        ShadowSQLiteStatement prog = db.compileStatement(query);
+    public static String stringForQuery(SQLiteDatabase db, String query, String[] selectionArgs) {
+        SQLiteStatement prog = db.compileStatement(query);
         try {
             return stringForQuery(prog, selectionArgs);
         } finally {
@@ -877,7 +879,7 @@ public class ShadowDatabaseUtils {
      * Utility method to run the pre-compiled query and return the value in the
      * first column of the first row.
      */
-    public static String stringForQuery(ShadowSQLiteStatement prog, String[] selectionArgs) {
+    public static String stringForQuery(SQLiteStatement prog, String[] selectionArgs) {
         prog.bindAllArgsAsStrings(selectionArgs);
         return prog.simpleQueryForString();
     }
@@ -888,9 +890,9 @@ public class ShadowDatabaseUtils {
      *
      * @return A read-only file descriptor for a copy of the blob value.
      */
-    public static ParcelFileDescriptor blobFileDescriptorForQuery(ShadowSQLiteDatabase db,
+    public static ParcelFileDescriptor blobFileDescriptorForQuery(SQLiteDatabase db,
                                                                   String query, String[] selectionArgs) {
-        ShadowSQLiteStatement prog = db.compileStatement(query);
+        SQLiteStatement prog = db.compileStatement(query);
         try {
             return blobFileDescriptorForQuery(prog, selectionArgs);
         } finally {
@@ -904,7 +906,7 @@ public class ShadowDatabaseUtils {
      *
      * @return A read-only file descriptor for a copy of the blob value.
      */
-    public static ParcelFileDescriptor blobFileDescriptorForQuery(ShadowSQLiteStatement prog,
+    public static ParcelFileDescriptor blobFileDescriptorForQuery(SQLiteStatement prog,
                                                                   String[] selectionArgs) {
         prog.bindAllArgsAsStrings(selectionArgs);
         return prog.simpleQueryForBlobFileDescriptor();
@@ -1020,10 +1022,10 @@ public class ShadowDatabaseUtils {
         private final ShadowSQLiteDatabase     mDb;
         private final String                   mTableName;
         private       HashMap<String, Integer> mColumns;
-        private String                mInsertSQL         = null;
-        private ShadowSQLiteStatement mInsertStatement   = null;
-        private ShadowSQLiteStatement mReplaceStatement  = null;
-        private ShadowSQLiteStatement mPreparedStatement = null;
+        private String          mInsertSQL         = null;
+        private SQLiteStatement mInsertStatement   = null;
+        private SQLiteStatement mReplaceStatement  = null;
+        private SQLiteStatement mPreparedStatement = null;
 
         /**
          * {@hide}
@@ -1095,7 +1097,7 @@ public class ShadowDatabaseUtils {
             if (DEBUG) Log.v(TAG, "insert statement is " + mInsertSQL);
         }
 
-        private ShadowSQLiteStatement getStatement(boolean allowReplace) throws SQLException {
+        private SQLiteStatement getStatement(boolean allowReplace) throws SQLException {
             if (allowReplace) {
                 if (mReplaceStatement == null) {
                     if (mInsertSQL == null) buildSQL();
@@ -1133,7 +1135,7 @@ public class ShadowDatabaseUtils {
             // effect as grabbing a lock but without the potential for deadlocks.
             mDb.beginTransactionNonExclusive();
             try {
-                ShadowSQLiteStatement stmt = getStatement(allowReplace);
+                SQLiteStatement stmt = getStatement(allowReplace);
                 stmt.clearBindings();
                 if (DEBUG) Log.v(TAG, "--- inserting in table " + mTableName);
                 for (Map.Entry<String, Object> e : values.valueSet()) {

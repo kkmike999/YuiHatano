@@ -20,8 +20,8 @@ class KbSqlBuilder {
      * @param args Object支持int、long、float、double、String、Collection子类.<br>注意，参数是String，sql语句本身不需要"' '"(单引号)
      * @return
      */
-    public static String sql(String sql, String... args) {
-        return sql(sql, (Object[]) args);
+    public static String bindArgs(String sql, String... args) {
+        return bindArgs(sql, (Object[]) args);
     }
 
     /**
@@ -33,7 +33,7 @@ class KbSqlBuilder {
      * @param args Object支持int、long、float、double、String、Collection子类.<br>注意，参数是String，sql语句本身不需要"' '"(单引号)
      * @return
      */
-    public static String sql(String sql, Object... args) {
+    public static String bindArgs(String sql, Object... args) {
 
         sql = sql.replace("?", "%s");
 
@@ -51,7 +51,7 @@ class KbSqlBuilder {
      * @param args Object支持int、long、float、double、String、Collection子类.<br>注意，参数是String，sql语句本身不需要"' '"(单引号)
      * @return
      */
-    public static String sql(String sql, List<String> args) {
+    public static String bindArgs(String sql, List<String> args) {
 
         sql = sql.replace("?", "%s");
 

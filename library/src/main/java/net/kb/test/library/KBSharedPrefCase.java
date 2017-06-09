@@ -7,15 +7,16 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.ShadowResources;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.ShadowSQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.DisplayMetrics;
+
+import net.kb.test.library.utils.DbPathUtils;
 
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kkmike999 on 2017/05/25.
@@ -24,9 +25,6 @@ public class KBSharedPrefCase {
 
     private Context       mContext;
     private ShadowContext mShadowContext;
-
-    private List<String>         dbPaths = new ArrayList<>();
-    private List<SQLiteDatabase> dbs     = new ArrayList<>();
 
     @Rule
     public ExternalResource contextRule = new ExternalResource() {
@@ -46,10 +44,15 @@ public class KBSharedPrefCase {
 
         @Override
         protected void after() {
-            for (SQLiteDatabase db : dbs) {
-                db.close();
-            }
-            for (String dbPath : dbPaths) {
+            Map<String, SQLiteDatabase> dbMap = mShadowContext.getDbMap();
+
+            for (String dbName : dbMap.keySet()) {
+                // 关闭数据库
+                dbMap.get(dbName).close();
+
+                String dbPath = DbPathUtils.getDbPath(dbName);
+
+                // 删除数据库文件
                 new File(dbPath).delete();
             }
         }
@@ -63,20 +66,19 @@ public class KBSharedPrefCase {
         return mShadowContext;
     }
 
-    protected SQLiteDatabase newSQLiteDatabase(String name) {
-        try {
-            String path = "build/sample_" + name + ".db";
+    protected SQLiteDatabase newSQLiteDatabase(String dbName) {
+        SQLiteOpenHelper openHelper = new SQLiteOpenHelper(getContext(), dbName, null, 1) {
+            @Override
+            public void onCreate(SQLiteDatabase db) {}
 
-            dbPaths.add(path);
+            @Override
+            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+        };
 
-            ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
-            SQLiteDatabase       db  = new CGLibProxy().getInstance(SQLiteDatabase.class, sdb);
+        return openHelper.getWritableDatabase();
+    }
 
-            dbs.add(db);
-
-            return db;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    protected void putSQLDatabase(String dbName, SQLiteDatabase db) {
+        mShadowContext.putSQLiteDatabase(dbName, db);
     }
 }

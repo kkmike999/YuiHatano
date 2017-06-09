@@ -34,6 +34,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.Printer;
 
+import net.kb.test.library.CGLibProxy;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.sql.Connection;
@@ -76,6 +78,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     private static final int EVENT_DB_CORRUPT = 75004;
 
     public static boolean DEBUG = true;
+
+    SQLiteDatabase mockDatabase;
 
     // Stores reference to all databases opened in the current process.
     // (The referent Object is not used at this time.)
@@ -278,6 +282,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     @Override
     protected void onAllReferencesReleased() {
         dispose(false);
+    }
+
+    public void setMockDatabase(SQLiteDatabase mockDatabase) {
+        this.mockDatabase = mockDatabase;
     }
 
     private void dispose(boolean finalized) {
@@ -596,7 +604,13 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public boolean isDbLockedByCurrentThread() {
         acquireReference();
         try {
-            return getThreadSession().hasConnection();
+//            return getThreadSession().hasConnection();
+            try {
+                return mConnection != null && !mConnection.isClosed();
+            } catch (java.sql.SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
         } finally {
             releaseReference();
         }
@@ -815,8 +829,12 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         super.close();
 
         try {
-            mConnection.close();
-            mConnection = null;
+            if (mConnection != null) {
+                mConnection.close();
+                mConnection = null;
+            } else {
+                err("mConnection==null");
+            }
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
@@ -1015,21 +1033,27 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     /**
      * Compiles an SQL statement into a reusable pre-compiled statement object.
      * The parameters are identical to {@link #execSQL(String)}. You may put ?s in the
-     * statement and fill in those values with {@link ShadowSQLiteProgram#bindString}
-     * and {@link ShadowSQLiteProgram#bindLong} each time you want to run the
+     * statement and fill in those values with {@link SQLiteProgram#bindString}
+     * and {@link SQLiteProgram#bindLong} each time you want to run the
      * statement. Statements may not return result sets larger than 1x1.
      * <p>
-     * No two threads should be using the same {@link ShadowSQLiteStatement} at the same time.
+     * No two threads should be using the same {@link SQLiteStatement} at the same time.
      *
      * @param sql The raw SQL statement, may contain ? for unknown values to be
      *            bound later.
-     * @return A pre-compiled {@link ShadowSQLiteStatement} object. Note that
-     * {@link ShadowSQLiteStatement}s are not synchronized, see the documentation for more details.
+     * @return A pre-compiled {@link SQLiteStatement} object. Note that
+     * {@link SQLiteStatement}s are not synchronized, see the documentation for more details.
      */
-    public ShadowSQLiteStatement compileStatement(String sql) throws SQLException {
+    public SQLiteStatement compileStatement(String sql) throws SQLException {
         acquireReference();
         try {
-            return new ShadowSQLiteStatement(this, sql, null);
+            ShadowSQLiteStatement shadowSQLiteStatement = new ShadowSQLiteStatement(this, sql, null);
+
+            // SQLiteDatabase db, String sql, Object[] bindArgs
+            Class[] argTypes = new Class[]{SQLiteDatabase.class, String.class, Object[].class};
+
+            // SQLiteStatement只有 public SQLiteStatement()构造函数
+            return new CGLibProxy().getInstance(SQLiteStatement.class, shadowSQLiteStatement);
         } finally {
             releaseReference();
         }
@@ -1533,7 +1557,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                     }
                     valuesSql.append(')');
 
-                    String valuesStr = KbSqlBuilder.sql(valuesSql.toString(), bindArgs);
+                    String valuesStr = KbSqlBuilder.bindArgs(valuesSql.toString(), bindArgs);
 
                     sql.append(valuesStr);
                 }
@@ -1606,7 +1630,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             long beforeCount = getRows(table);
 
             // 处理where语句
-            String afterWhere = KbSqlBuilder.sql(whereClause, (Object[]) whereArgs);
+            String afterWhere = KbSqlBuilder.bindArgs(whereClause, (Object[]) whereArgs);
             String sql        = "DELETE FROM " + table + (!TextUtils.isEmpty(afterWhere) ? " WHERE " + afterWhere : "");
 
             debug(sql);
@@ -1682,14 +1706,13 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             }
             if (!TextUtils.isEmpty(whereClause)) {
                 sql.append(" WHERE ");
-
-                String afterWhere = KbSqlBuilder.sql(whereClause, whereArgs);
-
-                sql.append(afterWhere);
+                sql.append(whereClause);
             }
 
+            String afterSql = KbSqlBuilder.bindArgs(sql.toString(), bindArgs);
+
             Statement statement = mConnection.createStatement();
-            int       rowCount  = statement.executeUpdate(sql.toString());
+            int       rowCount  = statement.executeUpdate(afterSql.toString());
 
             if (!isTransaction) {
                 mConnection.commit();
@@ -1791,7 +1814,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             }
 
             // TODO: 17/6/8 估计有bug
-            String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : KbSqlBuilder.sql(sql, bindArgs);
+            String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : KbSqlBuilder.bindArgs(sql, bindArgs);
 
             debug(afterSql);
 
@@ -2290,8 +2313,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             }
 
             for (int i = 0; i < attachedDbs.size(); i++) {
-                Pair<String, String>  p    = attachedDbs.get(i);
-                ShadowSQLiteStatement prog = null;
+                Pair<String, String> p    = attachedDbs.get(i);
+                SQLiteStatement      prog = null;
                 try {
                     prog = compileStatement("PRAGMA " + p.first + ".integrity_check(1);");
                     String rslt = prog.simpleQueryForString();
@@ -2325,6 +2348,12 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     protected void debug(CharSequence sql) {
         if (DEBUG) {
             System.out.println(sql);
+        }
+    }
+
+    protected void err(CharSequence sql) {
+        if (DEBUG) {
+            System.err.println(sql);
         }
     }
 

@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class SQLiteTest {
 
     @After
     public void tearDown() throws Exception {
-//        new File("build/sample.db").delete();
+        new File("build/sample.db").delete();
     }
 
     @Test
@@ -79,10 +80,16 @@ public class SQLiteTest {
         cv.put("id", 1);
         cv.put("name", "leo_update");
 
-        // UPDATE person SET name=?,id=? WHERE name='leo'
+        // UPDATE person SET id=1,name='leo_update', WHERE name='leo'
         int row = db.update("person", cv, "name=?", new String[]{"leo"});
 
         System.out.println("影响行数 row=" + row);
+
+        Cursor cursor = db.rawQuery("SELECT * FROM person", null);
+
+        List<Person> persons = getPersons(cursor);
+
+        System.out.println(persons.toString());
     }
 
     @Test

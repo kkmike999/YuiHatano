@@ -1,11 +1,16 @@
 package android.content;
 
+import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.ShadowSQLiteDatabase;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
+import net.kb.test.library.CGLibProxy;
+import net.kb.test.library.utils.DbPathUtils;
 import net.kkmike.sptest.SharedPreferencesHelper;
 
 import java.util.HashMap;
@@ -45,6 +50,7 @@ public class ShadowContext {
         return mockContext;
     }
 
+    /////////////////////////////   SQLiteDatabase    /////////////////////////////
     public void putSQLiteDatabase(String name, SQLiteDatabase db) {
         dbMap.put(name, db);
     }
@@ -53,9 +59,33 @@ public class ShadowContext {
         return openOrCreateDatabase(name, mode, factory, null);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public SQLiteDatabase openOrCreateDatabase(String name, int mode, SQLiteDatabase.CursorFactory factory, DatabaseErrorHandler errorHandler) {
-        return dbMap.get(name);
+        if (dbMap.containsKey(name)) {
+            return dbMap.get(name);
+        }
+        // 创建数据库
+        try {
+            String path = DbPathUtils.getDbPath(name);
+
+            ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
+            SQLiteDatabase       db  = new CGLibProxy().getInstance(SQLiteDatabase.class, sdb);
+
+            sdb.setMockDatabase(db);
+
+            putSQLiteDatabase(name, db);
+
+            return db;
+        } catch (java.sql.SQLException e) {
+            throw new android.database.SQLException("", e);
+        }
     }
+
+    public Map<String, SQLiteDatabase> getDbMap() {
+        return dbMap;
+    }
+
+    /////////////////////////////   SQLiteDatabase end  /////////////////////////////
 
     @Override
     public String toString() {

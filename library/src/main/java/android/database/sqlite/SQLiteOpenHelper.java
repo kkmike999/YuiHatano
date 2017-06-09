@@ -16,8 +16,6 @@ public abstract class SQLiteOpenHelper {
     private static final String MY_TAG = "mytag";
     private static final String TAG    = SQLiteOpenHelper.class.getSimpleName();
 
-    private static boolean DEBUG = false;
-
     private static final boolean DEBUG_STRICT_READONLY = false;
 
     private final Context                      mContext;
@@ -85,6 +83,8 @@ public abstract class SQLiteOpenHelper {
                     ReflectUtils.invoke(db, "reopenReadWrite");
                 }
             } else if (mName == null) {
+                debug("mName == null ; db = SQLiteDatabase.create(null)");
+
                 db = SQLiteDatabase.create(null);
             } else {
                 try {
@@ -92,7 +92,7 @@ public abstract class SQLiteOpenHelper {
                         String path = mContext.getDatabasePath(mName).getPath();
                         db = SQLiteDatabase.openDatabase(path, mFactory, SQLiteDatabase.OPEN_READONLY, mErrorHandler);
                     } else {
-                        debug("openOrCreateDatabase . mContext=" + mContext);
+                        debug("openOrCreateDatabase ; mContext=" + mContext + "; mName=" + mName);
                         db = mContext.openOrCreateDatabase(mName, mEnableWriteAheadLogging ? Context.MODE_ENABLE_WRITE_AHEAD_LOGGING : 0, mFactory, mErrorHandler);
                     }
                 } catch (SQLiteException ex) {
@@ -152,7 +152,7 @@ public abstract class SQLiteOpenHelper {
     }
 
     private void debug(String msg) {
-        if (DEBUG) {
+        if (SQLiteOpenHelperHook.DEBUG) {
             System.out.println(msg);
         }
     }
