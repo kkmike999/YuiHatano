@@ -19,7 +19,7 @@ import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.parser.KbSqlParserManager;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -28,7 +28,6 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -49,8 +48,8 @@ public class KbSqlParser {
         }
 
         try {
-            CCJSqlParserManager pm        = new CCJSqlParserManager();
-            Statement           statement = pm.parse(new StringReader(sql));
+            KbSqlParserManager pm        = new KbSqlParserManager();
+            Statement          statement = pm.parse(sql);
 
             Set<Expression> expressionSet = findBindArgsExpressions(statement);
 
@@ -155,10 +154,10 @@ public class KbSqlParser {
             bindExpressionArgs(binaryExpression.getRightExpression(), iterator);
 
             return;
-        } else if (expression instanceof ValueExpression) {
+        } else if (expression instanceof ValuesExpression) {
             // INSERT ..... VALUES (?,?, ...)
-            ValueExpression  valueExpression = (ValueExpression) expression;
-            List<Expression> exps            = valueExpression.getExpressions();
+            ValuesExpression valuesExpression = (ValuesExpression) expression;
+            List<Expression> exps             = valuesExpression.getExpressions();
 
             for (int i = 0; i < exps.size(); i++) {
                 Expression exp = exps.get(i);
@@ -173,7 +172,6 @@ public class KbSqlParser {
         } else if (expression instanceof UpdateSetExpression) {
             UpdateSetExpression updateSetExp = (UpdateSetExpression) expression;
             List<Expression>    exps         = updateSetExp.getExpressions();
-            List<Column>        columns      = updateSetExp.getColumns();
 
             for (int i = 0; i < exps.size(); i++) {
                 Expression exp = exps.get(i);
@@ -188,6 +186,89 @@ public class KbSqlParser {
         }
     }
 
+    protected static int getBindArgsCount(String sql) {
+        Set<Expression> expressionSet = findBindArgsExpressions(sql);
+
+        int count = 0;
+
+        for (Expression expression : expressionSet) {
+            count += getBindArgsCount(expression);
+        }
+
+        return count;
+    }
+
+    /**
+     * 获取表达式中，绑定变量数量
+     *
+     * @param expression 表达式应该包含{@linkplain JdbcParameter}
+     * @return
+     */
+    protected static int getBindArgsCount(Expression expression) {
+        if (expression instanceof JdbcParameter) {
+            return 1;
+        } else if (expression instanceof EqualsTo) {
+            if (((EqualsTo) expression).getRightExpression() instanceof JdbcParameter) {
+                return 1;
+            }
+        } else if (expression instanceof Between) {
+            Between between = (Between) expression;
+
+            int count = 0;
+
+            count += getBindArgsCount(between.getBetweenExpressionStart());
+            count += getBindArgsCount(between.getBetweenExpressionEnd());
+
+            return count;
+        } else if (expression instanceof LikeExpression) {
+
+            if (((LikeExpression) expression).getRightExpression() instanceof JdbcParameter) {
+                return 1;
+            }
+        } else if (expression instanceof ValuesExpression) {
+            List<Expression> expressions = ((ValuesExpression) expression).getExpressions();
+
+            int count = 0;
+
+            for (Expression exp : expressions) {
+                if (exp instanceof JdbcParameter) {
+                    count++;
+                }
+            }
+
+            return count;
+        } else if (expression instanceof InExpression) {
+            InExpression   inExpression = (InExpression) expression;
+            ExpressionList itemsList    = (ExpressionList) inExpression.getRightItemsList();
+
+            List<Expression> exps = itemsList.getExpressions();
+
+            int count = 0;
+
+            for (Expression exp : exps) {
+                if (exp instanceof JdbcParameter) {
+                    count++;
+                }
+            }
+
+            return count;
+        } else if (expression instanceof UpdateSetExpression) {
+            UpdateSetExpression updateSetExp = (UpdateSetExpression) expression;
+            List<Expression>    exps         = updateSetExp.getExpressions();
+
+            int count = 0;
+
+            for (Expression exp : exps) {
+                if (exp instanceof JdbcParameter) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+        return 0;
+    }
+
     /**
      * 找到所有绑定变量
      *
@@ -195,10 +276,14 @@ public class KbSqlParser {
      * @return
      */
     protected static Set<Expression> findBindArgsExpressions(String sql) {
-        CCJSqlParserManager pm = new CCJSqlParserManager();
+        if (sql == null || sql.startsWith("PRAGMA")) {
+            return new LinkedHashSet<>();
+        }
+
+        KbSqlParserManager pm = new KbSqlParserManager();
 
         try {
-            Statement statement = pm.parse(new StringReader(sql));
+            Statement statement = pm.parse(sql);
 
             Set<Expression> expressionSet = findBindArgsExpressions(statement);
 
@@ -226,7 +311,7 @@ public class KbSqlParser {
 
             for (Expression expression : expressions) {
                 if (expression instanceof JdbcParameter) {
-                    expressionSet.add(new ValueExpression(expressions));
+                    expressionSet.add(new ValuesExpression(expressions));
                     break;
                 }
             }
@@ -375,10 +460,10 @@ public class KbSqlParser {
         public void accept(ExpressionVisitor expressionVisitor) {}
     }
 
-    private static class ValueExpression implements Expression {
+    private static class ValuesExpression implements Expression {
         List<Expression> exps = new ArrayList<>();
 
-        public ValueExpression(List<Expression> exps) {
+        public ValuesExpression(List<Expression> exps) {
             this.exps = exps;
         }
 

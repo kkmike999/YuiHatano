@@ -43,19 +43,19 @@ public class ShadowCursor implements Cursor {
     @Override
     public boolean moveToPosition(int position) {
         mPosition = position;
-        return false;
+        return mPosition >= 0 && mPosition < mDatas.size();
     }
 
     @Override
     public boolean moveToFirst() {
         mPosition = 0;
-        return false;
+        return true;
     }
 
     @Override
     public boolean moveToLast() {
         mPosition = mDatas.size() - 1;
-        return false;
+        return true;
     }
 
     @Override

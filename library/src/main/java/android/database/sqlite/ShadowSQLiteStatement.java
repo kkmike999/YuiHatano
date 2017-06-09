@@ -16,11 +16,17 @@
 
 package android.database.sqlite;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
+
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.KbSqlParserManager;
+import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.update.Update;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -46,7 +52,9 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     public void execute() {
         acquireReference();
         try {
-            getSession().execute(getSql(), getBindArgs(), getConnectionFlags(), null);
+//            getSession().execute(getSql(), getBindArgs(), getConnectionFlags(), null);
+
+            getDatabase().execSQL(getSql(), getBindArgs());
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
@@ -63,11 +71,54 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * @throws android.database.SQLException If the SQL string is invalid for
      *                                       some reason
      */
-    public int executeUpdateDelete() {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public int executeUpdateDelete() throws JSQLParserException {
         acquireReference();
         try {
-            return getSession().executeForChangedRowCount(
-                    getSql(), getBindArgs(), getConnectionFlags(), null);
+//            return getSession().executeForChangedRowCount(
+//                    getSql(), getBindArgs(), getConnectionFlags(), null);
+
+            String                                sql        = getSql();
+            Object[]                              bindArgs   = getBindArgs();
+            KbSqlParserManager                    sqlManager = new KbSqlParserManager();
+            net.sf.jsqlparser.statement.Statement stm        = sqlManager.parse(sql);
+
+            try {
+                sql = KbSqlParser.bindArgs(sql, bindArgs);
+
+                int rows;
+
+                Connection mConnection = getDatabase().getConnection();
+                Statement  statement   = mConnection.createStatement();
+
+                if (stm instanceof Update) {
+                    rows = statement.executeUpdate(sql);
+
+                    if (!getDatabase().isTransaction) {
+                        mConnection.commit();
+                    }
+                } else {
+                    String table = ((Delete) stm).getTable().getName();
+
+                    long beforeCount = getDatabase().getRows(table);
+
+                    statement.execute(getSql());
+
+                    if (!getDatabase().isTransaction) {
+                        mConnection.commit();
+                    }
+
+                    long afterCount = getDatabase().getRows(table);
+
+                    rows = (int) (afterCount - beforeCount);
+                }
+
+                statement.close();
+
+                return rows;
+            } catch (java.sql.SQLException e) {
+                throw new android.database.SQLException("", e);
+            }
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
@@ -87,8 +138,10 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     public long executeInsert() {
         acquireReference();
         try {
-            return getSession().executeForLastInsertedRowId(
-                    getSql(), getBindArgs(), getConnectionFlags(), null);
+            getDatabase().execSQL(getSql(), getBindArgs());
+
+            return 0;
+//            return getSession().executeForLastInsertedRowId(getSql(), getBindArgs(), getConnectionFlags(), null);
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
@@ -100,6 +153,8 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     /**
      * Execute a statement that returns a 1 by 1 table with a numeric value.
      * For example, SELECT COUNT(*) FROM table;
+     * <p>
+     * 貌似是查询第一行第一个元素
      *
      * @return The result of the query.
      * @throws SQLiteDoneException if the query returns zero rows
@@ -109,20 +164,25 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
         try {
             String   sql  = getSql();
             Object[] args = getBindArgs();
-//            return getSession().executeForLong(
-//                    getSql(), getBindArgs(), getConnectionFlags(), null);
+
+            sql = KbSqlParser.bindArgs(sql, args);
 
             Connection connection = getDatabase().getConnection();
             Statement  statement  = connection.createStatement();
             ResultSet  rs         = statement.executeQuery(sql);
 
-            int columnIndex  = rs.findColumn("user_version");
-            int user_version = rs.getInt(columnIndex);
+//            int columnIndex  = rs.findColumn("user_version");
+//            int user_version = rs.getInt(columnIndex);
+
+            long first = rs.getLong(1);
 
             rs.close();
             statement.close();
 
-            return user_version;
+            return first;
+
+//            return getSession().executeForLong(
+//                    getSql(), getBindArgs(), getConnectionFlags(), null);
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;

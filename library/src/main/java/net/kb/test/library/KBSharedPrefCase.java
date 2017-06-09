@@ -28,10 +28,15 @@ public class KBSharedPrefCase {
 
     @Rule
     public ExternalResource contextRule = new ExternalResource() {
+
         @Override
         protected void before() throws Throwable {
             // android sdk Resource只有这个构造函数
 //            public Resources(AssetManager assets, DisplayMetrics metrics, Configuration config)
+
+            // 删除、重新创建 临时数据库目录
+            deleteDbDir();
+            createDbDir();
 
             ShadowResources shadowResources = new ShadowResources();
             Resources       resources       = new CGLibProxy().getInstance(Resources.class, shadowResources, new Class[]{AssetManager.class, DisplayMetrics.class, Configuration.class}, new Object[]{null, null, null});
@@ -52,8 +57,36 @@ public class KBSharedPrefCase {
 
                 String dbPath = DbPathUtils.getDbPath(dbName);
 
-                // 删除数据库文件
+                // 删除临时数据库文件
                 new File(dbPath).delete();
+            }
+
+            deleteDbDir();
+        }
+
+        /**
+         * 创建数据库临时目录
+         */
+        private void createDbDir() {
+            File dbDir = new File(DbPathUtils.getDbDir());
+
+            if (!dbDir.exists()) {
+                dbDir.mkdirs();
+            }
+        }
+
+        /**
+         * 删除数据库
+         */
+        private void deleteDbDir() {
+            File   dbDir = new File(DbPathUtils.getDbDir());
+            File[] files = dbDir.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+                dbDir.delete();
             }
         }
     };

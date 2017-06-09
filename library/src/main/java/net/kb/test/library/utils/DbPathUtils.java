@@ -6,6 +6,10 @@ package net.kb.test.library.utils;
 public class DbPathUtils {
 
     public static String getDbPath(String dbName) {
-        return "build/" + dbName + ".dp";
+        return "build/db/" + dbName + (dbName.endsWith(".db") ? "" : ".db");
+    }
+
+    public static String getDbDir() {
+        return "build/db/";
     }
 }

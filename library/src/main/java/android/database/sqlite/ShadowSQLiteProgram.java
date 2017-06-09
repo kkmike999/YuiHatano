@@ -60,10 +60,10 @@ public abstract class ShadowSQLiteProgram extends SQLiteClosable {
 
                 mReadOnly = info.readOnly;
                 mColumnNames = info.columnNames;
-//                mNumParameters = info.numParameters;
+                mNumParameters = KbSqlParser.getBindArgsCount(sql);//info.numParameters;
 
                 // 先根据？来判断mNumParameters
-                mNumParameters = bindArgs == null ? 0 : bindArgs.length;
+//                mNumParameters = bindArgs == null ? 0 : bindArgs.length;
                 break;
         }
 

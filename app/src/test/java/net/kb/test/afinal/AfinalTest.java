@@ -1,7 +1,6 @@
 package net.kb.test.afinal;
 
 import android.content.Context;
-import android.content.ShadowContext;
 
 import net.kb.test.bean.Bean;
 import net.kb.test.library.KBSharedPrefCase;
@@ -25,11 +24,7 @@ public class AfinalTest extends KBSharedPrefCase {
 
     @Before
     public void setUp() throws Exception {
-        String dbName = "afinal.db";
-
         Context       context       = getContext();
-        ShadowContext shadowContext = getShadowContext();
-        shadowContext.putSQLiteDatabase(dbName, newSQLiteDatabase(dbName));
 
         finalDb = FinalDb.create(context, false);
 

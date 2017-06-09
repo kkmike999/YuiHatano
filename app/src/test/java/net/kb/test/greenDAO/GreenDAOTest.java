@@ -1,6 +1,7 @@
 package net.kb.test.greenDAO;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelperHook;
 
@@ -60,6 +61,8 @@ public class GreenDAOTest extends KBSharedPrefCase {
     @Test
     public void testInsert() {
         insert(1, "kk1");
+
+        Cursor cursor = mDaoSession.getDatabase().rawQuery("SELECT T.\"_id\",T.\"UID\",T.\"NAME\" FROM \"USER\" T ", null);
 
         List<User> users = mUserDAO.loadAll();
 

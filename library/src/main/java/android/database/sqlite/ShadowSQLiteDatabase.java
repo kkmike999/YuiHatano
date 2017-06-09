@@ -259,12 +259,11 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         mConfigurationLocked = new SQLiteDatabaseConfiguration(path, openFlags);
         mErrorHandler = null;
 
-//        boolean exist = new File(path).exists();
-//        debug("is db " + path + " exist=" + exist);
+        File parent = new File(path).getParentFile();
 
-//        if (!exist) {
-//            new File(path).mkdir();
-//        }
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
 
         mConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
         mConnection.setAutoCommit(false);
@@ -925,7 +924,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *
      * @param version the new database version
      */
-    public void setVersion(int version) throws java.sql.SQLException {
+    public void setVersion(int version) {
         execSQL("PRAGMA user_version = " + version);
     }
 
@@ -974,7 +973,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *
      * @param numBytes the database page size, in bytes
      */
-    public void setPageSize(long numBytes) throws java.sql.SQLException {
+    public void setPageSize(long numBytes) {
         execSQL("PRAGMA page_size = " + numBytes);
     }
 
@@ -1430,9 +1429,6 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         } catch (SQLException e) {
             Log.e(TAG, "Error inserting " + values, e);
             return -1;
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-            return -1;
         }
     }
 
@@ -1453,7 +1449,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      * @throws SQLException
      */
-    public long insertOrThrow(String table, String nullColumnHack, ContentValues values) throws SQLException, java.sql.SQLException {
+    public long insertOrThrow(String table, String nullColumnHack, ContentValues values) throws SQLException {
         return insertWithOnConflict(table, nullColumnHack, values, CONFLICT_NONE);
     }
 
@@ -1478,9 +1474,6 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                     CONFLICT_REPLACE);
         } catch (SQLException e) {
             Log.e(TAG, "Error inserting " + initialValues, e);
-            return -1;
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
             return -1;
         }
     }
@@ -1525,7 +1518,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * or an error occurred.
      */
     public long insertWithOnConflict(String table, String nullColumnHack,
-                                     ContentValues initialValues, int conflictAlgorithm) throws java.sql.SQLException {
+                                     ContentValues initialValues, int conflictAlgorithm) {
         acquireReference();
         try {
             StringBuilder sql = new StringBuilder();
@@ -1624,7 +1617,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * otherwise. To remove all rows and get a count pass "1" as the
      * whereClause.
      */
-    public int delete(String table, String whereClause, String[] whereArgs) throws java.sql.SQLException {
+    public int delete(String table, String whereClause, String[] whereArgs) {
         acquireReference();
         try {
             long beforeCount = getRows(table);
@@ -1657,7 +1650,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                    will be bound as Strings.
      * @return the number of rows affected
      */
-    public int update(String table, ContentValues values, String whereClause, String[] whereArgs) throws java.sql.SQLException {
+    public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
         return updateWithOnConflict(table, values, whereClause, whereArgs, CONFLICT_NONE);
     }
 
@@ -1675,7 +1668,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param conflictAlgorithm for update conflict resolver
      * @return the number of rows affected
      */
-    public int updateWithOnConflict(String table, ContentValues values, String whereClause, String[] whereArgs, int conflictAlgorithm) throws java.sql.SQLException {
+    public int updateWithOnConflict(String table, ContentValues values, String whereClause, String[] whereArgs, int conflictAlgorithm) {
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("Empty values");
         }
@@ -1711,14 +1704,17 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
             String afterSql = KbSqlBuilder.bindArgs(sql.toString(), bindArgs);
 
-            Statement statement = mConnection.createStatement();
-            int       rowCount  = statement.executeUpdate(afterSql.toString());
+            try {
+                Statement statement = mConnection.createStatement();
+                int       rowCount  = statement.executeUpdate(afterSql.toString());
 
-            if (!isTransaction) {
-                mConnection.commit();
+                if (!isTransaction) {
+                    mConnection.commit();
+                }
+                return rowCount;
+            } catch (java.sql.SQLException e) {
+                throw new SQLException("", e);
             }
-
-            return rowCount;
         } finally {
             releaseReference();
         }
@@ -1743,7 +1739,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *            not supported.
      * @throws SQLException if the SQL string is invalid
      */
-    public void execSQL(String sql) throws SQLException, java.sql.SQLException {
+    public void execSQL(String sql) throws SQLException {
         executeSql(sql, null);
     }
 
@@ -1790,7 +1786,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param bindArgs only byte[], String, Long and Double are supported in bindArgs.
      * @throws SQLException if the SQL string is invalid
      */
-    public void execSQL(String sql, Object[] bindArgs) throws SQLException, java.sql.SQLException {
+    public void execSQL(String sql, Object[] bindArgs) throws SQLException {
         if (bindArgs == null) {
             throw new IllegalArgumentException("Empty bindArgs");
         }
