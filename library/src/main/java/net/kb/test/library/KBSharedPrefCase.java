@@ -1,5 +1,7 @@
 package net.kb.test.library;
 
+import android.app.Application;
+import android.app.ShadowApplication;
 import android.content.Context;
 import android.content.ShadowContext;
 import android.content.res.AssetManager;
@@ -24,6 +26,7 @@ import java.util.Map;
 public class KBSharedPrefCase {
 
     private Context       mContext;
+    private Application   mApplication;
     private ShadowContext mShadowContext;
 
     @Rule
@@ -32,7 +35,7 @@ public class KBSharedPrefCase {
         @Override
         protected void before() throws Throwable {
             // android sdk Resource只有这个构造函数
-//            public Resources(AssetManager assets, DisplayMetrics metrics, Configuration config)
+            // public Resources(AssetManager assets, DisplayMetrics metrics, Configuration config)
 
             // 删除、重新创建 临时数据库目录
             deleteDbDir();
@@ -43,6 +46,12 @@ public class KBSharedPrefCase {
             mShadowContext = new ShadowContext(resources);
 
             mContext = new CGLibProxy().getInstance(Context.class, mShadowContext);
+
+            // application
+            ShadowApplication shadowApplication = new ShadowApplication(resources);
+            mApplication = new CGLibProxy().getInstance(Application.class, mShadowContext);
+            
+            shadowApplication.setApplication(mApplication);
 
             mShadowContext.setMockContext(mContext);
         }
@@ -60,6 +69,8 @@ public class KBSharedPrefCase {
                 // 删除临时数据库文件
                 new File(dbPath).delete();
             }
+
+            dbMap.clear();
 
             deleteDbDir();
         }
@@ -97,6 +108,10 @@ public class KBSharedPrefCase {
 
     public ShadowContext getShadowContext() {
         return mShadowContext;
+    }
+
+    public Application getApplication() {
+        return mApplication;
     }
 
     protected SQLiteDatabase newSQLiteDatabase(String dbName) {

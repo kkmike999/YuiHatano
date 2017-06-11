@@ -825,8 +825,6 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             if (mConnection != null) {
                 mConnection.close();
                 mConnection = null;
-            } else {
-                err("mConnection==null");
             }
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
@@ -1549,7 +1547,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         String countQuery = "SELECT COUNT(*) FROM " + table;
 
         try {
-            ShadowSQLiteStatement shadowSQLiteStatement  = new ShadowSQLiteStatement(this,countQuery,null);
+            ShadowSQLiteStatement shadowSQLiteStatement = new ShadowSQLiteStatement(this, countQuery, null);
 
             return shadowSQLiteStatement.simpleQueryForLong();
         } catch (Exception e) {

@@ -37,4 +37,6 @@ dependencies {
 
 //    compile 'org.greenrobot:greendao-generator:3.2.0'
     compile 'org.greenrobot:greendao:3.2.0'
+
+    compile 'org.xutils:xutils:3.5.0'
 }
