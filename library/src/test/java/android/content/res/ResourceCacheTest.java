@@ -1,5 +1,6 @@
 package android.content.res;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,11 @@ public class ResourceCacheTest {
         mResourceCache = new ResourceCache();
     }
 
+    @After
+    public void tearDown() throws Exception {
+        mResourceCache.clearCache();
+    }
+
     @Test
     public void testGetIdTable() throws Exception {
         String rClassName = "net.kb.test.library.R$string";
@@ -29,6 +35,7 @@ public class ResourceCacheTest {
         Map<Integer, String> map1 = mResourceCache.getIdTableCache(rClassName);
 
         Assert.assertEquals(map0, map1);
+
     }
 
 }

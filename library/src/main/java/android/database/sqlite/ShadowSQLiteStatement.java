@@ -27,6 +27,7 @@ import net.sf.jsqlparser.statement.update.Update;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -37,9 +38,23 @@ import java.sql.Statement;
  * This class is not thread-safe.
  * </p>
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
+
+    public static boolean DEBUG = false;
+
+    Connection mConnection;
+    Statement  mStatement;
+
     ShadowSQLiteStatement(ShadowSQLiteDatabase db, String sql, Object[] bindArgs) {
         super(db, sql, bindArgs, null);
+
+        mConnection = db.getConnection();
+        try {
+            mStatement = mConnection.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -52,9 +67,25 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     public void execute() {
         acquireReference();
         try {
-//            getSession().execute(getSql(), getBindArgs(), getConnectionFlags(), null);
+            //            getSession().execute(getSql(), getBindArgs(), getConnectionFlags(), null);
+            //            getDatabase().execSQL(getSql(), getBindArgs());
 
-            getDatabase().execSQL(getSql(), getBindArgs());
+            String   sql      = getSql();
+            Object[] bindArgs = getBindArgs();
+
+            String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : KbSqlBuilder.bindArgs(sql, bindArgs);
+
+            debug(afterSql);
+
+            try {
+                mStatement.execute(afterSql);
+
+                if (!getDatabase().isTransaction) {
+                    mConnection.commit();
+                }
+            } catch (java.sql.SQLException e) {
+                throw new android.database.SQLException("", e);
+            }
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
@@ -71,38 +102,86 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
      * @throws android.database.SQLException If the SQL string is invalid for
      *                                       some reason
      */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public int executeUpdateDelete() throws JSQLParserException {
+    public int executeUpdateDelete() {
         acquireReference();
         try {
-//            return getSession().executeForChangedRowCount(
-//                    getSql(), getBindArgs(), getConnectionFlags(), null);
+            String   sql      = getSql();
+            Object[] bindArgs = getBindArgs();
 
-            String                                sql        = getSql();
-            Object[]                              bindArgs   = getBindArgs();
-            KbSqlParserManager                    sqlManager = new KbSqlParserManager();
-            net.sf.jsqlparser.statement.Statement stm        = sqlManager.parse(sql);
+            // 以下语句报错：
+            // CREATE TABLE IF NOT EXISTS net_kb_test_bean_Bean ( "id"    INTEGER PRIMARY KEY AUTOINCREMENT,"uid","name" )
+            // 正确：
+            // CREATE TABLE IF NOT EXISTS net_kb_test_bean_Bean ( "id"    INTEGER PRIMARY KEY AUTOINCREMENT,"uid" VARCHAR,"name" VARCHAR)
 
-            try {
-                sql = KbSqlParser.bindArgs(sql, bindArgs);
+            // 特殊语句处理:
+            if (sql.trim().toUpperCase().startsWith("CREATE TABLE")) {
+                debug(sql);
 
-                int rows;
-
-                Connection mConnection = getDatabase().getConnection();
-                Statement  statement   = mConnection.createStatement();
-
-                if (stm instanceof Update) {
-                    rows = statement.executeUpdate(sql);
+                try {
+                    mStatement.execute(sql);
 
                     if (!getDatabase().isTransaction) {
                         mConnection.commit();
                     }
-                } else {
+                    return 0;
+                } catch (SQLException e) {
+                    throw new android.database.SQLException("", e);
+                }
+            }
+
+            // 防止"DELETE FROM 'USER'"
+            if (sql.trim().toUpperCase().startsWith("DELETE FROM")) {
+                StringBuilder sb = new StringBuilder(sql);
+
+                boolean hasWhere = sql.toUpperCase().contains("WHERE");
+
+                if (!hasWhere) {
+                    // 没有where才执行替换
+                    int len = (hasWhere ? sql.toUpperCase().indexOf("WHERE") : sb.length());
+
+                    int quotesCount = 0;
+
+                    for (int i = "DELETE FROM".length(); i < len; i++) {
+                        if (sb.charAt(i) == '\'') {
+                            if (quotesCount == 0) {
+                                quotesCount++;
+                                sb.setCharAt(i, '\"');
+                                continue;
+                            } else {
+                                quotesCount--;
+                                sb.setCharAt(i, '\"');
+                                break;
+                            }
+                        }
+                    }
+
+                    sql = sb.toString();
+                }
+            }
+
+            try {
+                KbSqlParserManager                    sqlManager = new KbSqlParserManager();
+                net.sf.jsqlparser.statement.Statement stm        = sqlManager.parse(sql);
+
+                sql = KbSqlParser.bindArgs(sql, bindArgs);
+
+                debug(sql);
+
+                int rows;
+
+                if (stm instanceof Update) {
+                    rows = mStatement.executeUpdate(sql);
+
+                    if (!getDatabase().isTransaction) {
+                        mConnection.commit();
+                    }
+                } else if (stm instanceof Delete) {
+                    // delete
                     String table = ((Delete) stm).getTable().getName();
 
                     long beforeCount = getDatabase().getRows(table);
 
-                    statement.execute(getSql());
+                    mStatement.execute(sql);
 
                     if (!getDatabase().isTransaction) {
                         mConnection.commit();
@@ -111,17 +190,26 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
                     long afterCount = getDatabase().getRows(table);
 
                     rows = (int) (afterCount - beforeCount);
-                }
+                } else {
+                    // TODO: 2017/6/11 不知道是否正确
+                    rows = mStatement.executeUpdate(sql);
 
-                statement.close();
+                    if (!getDatabase().isTransaction) {
+                        mConnection.commit();
+                    }
+                }
 
                 return rows;
             } catch (java.sql.SQLException e) {
+                debug(sql);
+
                 throw new android.database.SQLException("", e);
             }
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
+        } catch (JSQLParserException e) {
+            throw new RuntimeException(e);
         } finally {
             releaseReference();
         }
@@ -138,10 +226,12 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     public long executeInsert() {
         acquireReference();
         try {
-            getDatabase().execSQL(getSql(), getBindArgs());
+            //            getDatabase().execSQL(getSql(), getBindArgs());
+
+            execute();
 
             return 0;
-//            return getSession().executeForLastInsertedRowId(getSql(), getBindArgs(), getConnectionFlags(), null);
+            //            return getSession().executeForLastInsertedRowId(getSql(), getBindArgs(), getConnectionFlags(), null);
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
@@ -167,27 +257,23 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
 
             sql = KbSqlParser.bindArgs(sql, args);
 
-            Connection connection = getDatabase().getConnection();
-            Statement  statement  = connection.createStatement();
-            ResultSet  rs         = statement.executeQuery(sql);
+            debug(sql);
 
-//            int columnIndex  = rs.findColumn("user_version");
-//            int user_version = rs.getInt(columnIndex);
+            ResultSet rs = mStatement.executeQuery(sql);
 
             long first = rs.getLong(1);
 
             rs.close();
-            statement.close();
 
             return first;
 
-//            return getSession().executeForLong(
-//                    getSql(), getBindArgs(), getConnectionFlags(), null);
+            //            return getSession().executeForLong(
+            //                    getSql(), getBindArgs(), getConnectionFlags(), null);
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
         } catch (java.sql.SQLException e) {
-            throw new android.database.SQLException(e.getMessage());
+            throw new android.database.SQLException("", e);
         } finally {
             releaseReference();
         }
@@ -203,11 +289,27 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     public String simpleQueryForString() {
         acquireReference();
         try {
-            return getSession().executeForString(
-                    getSql(), getBindArgs(), getConnectionFlags(), null);
+            //            return getSession().executeForString(getSql(), getBindArgs(), getConnectionFlags(), null);
+
+            String   sql  = getSql();
+            Object[] args = getBindArgs();
+
+            sql = KbSqlParser.bindArgs(sql, args);
+
+            debug(sql);
+
+            ResultSet rs = mStatement.executeQuery(sql);
+
+            String first = rs.getString(1);
+
+            rs.close();
+
+            return first;
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
+        } catch (SQLException e) {
+            throw new android.database.SQLException("", e);
         } finally {
             releaseReference();
         }
@@ -223,13 +325,29 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
     public ParcelFileDescriptor simpleQueryForBlobFileDescriptor() {
         acquireReference();
         try {
-            return getSession().executeForBlobFileDescriptor(
-                    getSql(), getBindArgs(), getConnectionFlags(), null);
+            return getSession().executeForBlobFileDescriptor(getSql(), getBindArgs(), getConnectionFlags(), null);
         } catch (SQLiteDatabaseCorruptException ex) {
             onCorruption();
             throw ex;
         } finally {
             releaseReference();
+        }
+    }
+
+    protected void debug(CharSequence sql) {
+        if (DEBUG) {
+            System.out.println(sql);
+        }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        try {
+            mStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

@@ -48,4 +48,9 @@ public class ResourceCache {
     protected boolean hasValuesDocumentCache(String absolutePath) {
         return sValuesDocumentCache.containsKey(absolutePath);
     }
+
+    protected void clearCache(){
+        sResMap.clear();
+        sValuesDocumentCache.clear();
+    }
 }

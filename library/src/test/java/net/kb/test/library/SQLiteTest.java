@@ -25,14 +25,16 @@ public class SQLiteTest {
 
     @Before
     public void setUp() throws Exception {
-        sdb = new ShadowSQLiteDatabase("build/sample.db", 0, null);//ShadowSQLiteDatabaseHelper.newSqliteDatabase();
+        sdb = new ShadowSQLiteDatabase("build/db/sample.db", 0, null);//ShadowSQLiteDatabaseHelper.newSqliteDatabase();
 
         db = new CGLibProxy().getInstance(SQLiteDatabase.class, sdb);
     }
 
     @After
     public void tearDown() throws Exception {
-        new File("build/sample.db").delete();
+        db.close();
+
+        new File("build/db/sample.db").delete();
     }
 
     @Test

@@ -84,8 +84,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     // Stores reference to all databases opened in the current process.
     // (The referent Object is not used at this time.)
     // INVARIANT: Guarded by sActiveDatabases.
-    private static WeakHashMap<ShadowSQLiteDatabase, Object> sActiveDatabases =
-            new WeakHashMap<ShadowSQLiteDatabase, Object>();
+    private static WeakHashMap<ShadowSQLiteDatabase, Object> sActiveDatabases = new WeakHashMap<ShadowSQLiteDatabase, Object>();
 
     // Thread-local for database sessions that belong to this database.
     // Each thread has its own database session.
@@ -102,7 +101,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
     private final Object mLock = new Object();
 
-//    private final CloseGuard mCloseGuardLocked = CloseGuard.get();
+    //    private final CloseGuard mCloseGuardLocked = CloseGuard.get();
 
     private final SQLiteDatabaseConfiguration mConfigurationLocked;
 
@@ -174,8 +173,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     public static final int CONFLICT_NONE = 0;
 
-    private static final String[] CONFLICT_VALUES = new String[]
-            {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
+    private static final String[] CONFLICT_VALUES = new String[]{"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
     /**
      * Maximum Length Of A LIKE Or GLOB Pattern
@@ -288,39 +286,39 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     }
 
     private void dispose(boolean finalized) {
-//        final SQLiteConnectionPool pool;
-//        synchronized (mLock) {
-//            if (mCloseGuardLocked != null) {
-//                if (finalized) {
-//                    mCloseGuardLocked.warnIfOpen();
-//                }
-//                mCloseGuardLocked.close();
-//            }
-//
-//            pool = mConnectionPoolLocked;
-//            mConnectionPoolLocked = null;
-//        }
-//
-//        if (!finalized) {
-//            synchronized (sActiveDatabases) {
-//                sActiveDatabases.remove(this);
-//            }
-//
-//            if (pool != null) {
-//                pool.close();
-//            }
-//        }
+        //        final SQLiteConnectionPool pool;
+        //        synchronized (mLock) {
+        //            if (mCloseGuardLocked != null) {
+        //                if (finalized) {
+        //                    mCloseGuardLocked.warnIfOpen();
+        //                }
+        //                mCloseGuardLocked.close();
+        //            }
+        //
+        //            pool = mConnectionPoolLocked;
+        //            mConnectionPoolLocked = null;
+        //        }
+        //
+        //        if (!finalized) {
+        //            synchronized (sActiveDatabases) {
+        //                sActiveDatabases.remove(this);
+        //            }
+        //
+        //            if (pool != null) {
+        //                pool.close();
+        //            }
+        //        }
     }
 
-//    /**
-//     * Attempts to release memory that SQLite holds but does not require to
-//     * operate properly. Typically this memory will come from the page cache.
-//     *
-//     * @return the number of bytes actually released
-//     */
-//    public static int releaseMemory() {
-//        return SQLiteGlobal.releaseMemory();
-//    }
+    //    /**
+    //     * Attempts to release memory that SQLite holds but does not require to
+    //     * operate properly. Typically this memory will come from the page cache.
+    //     *
+    //     * @return the number of bytes actually released
+    //     */
+    //    public static int releaseMemory() {
+    //        return SQLiteGlobal.releaseMemory();
+    //    }
 
     /**
      * Control whether or not the ShadowSQLiteDatabase is made thread-safe by using locks
@@ -352,7 +350,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     void onCorruption() {
         EventLog.writeEvent(EVENT_DB_CORRUPT, getLabel());
         // TODO: 17/6/1
-//        mErrorHandler.onCorruption(this);
+        //        mErrorHandler.onCorruption(this);
     }
 
     /**
@@ -376,12 +374,12 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     }
 
     ShadowSQLiteSession createSession() {
-//        final SQLiteConnectionPool pool;
-//        synchronized (mLock) {
-//            throwIfNotOpenLocked();
-//            pool = mConnectionPoolLocked;
-//        }
-//        return new ShadowSQLiteSession(pool);
+        //        final SQLiteConnectionPool pool;
+        //        synchronized (mLock) {
+        //            throwIfNotOpenLocked();
+        //            pool = mConnectionPoolLocked;
+        //        }
+        //        return new ShadowSQLiteSession(pool);
         return null;
     }
 
@@ -393,8 +391,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @return The connection flags.
      */
     int getThreadDefaultConnectionFlags(boolean readOnly) {
-        int flags = readOnly ? SQLiteConnectionPool.CONNECTION_FLAG_READ_ONLY :
-                SQLiteConnectionPool.CONNECTION_FLAG_PRIMARY_CONNECTION_AFFINITY;
+        int flags = readOnly ? SQLiteConnectionPool.CONNECTION_FLAG_READ_ONLY : SQLiteConnectionPool.CONNECTION_FLAG_PRIMARY_CONNECTION_AFFINITY;
         if (isMainThread()) {
             flags |= SQLiteConnectionPool.CONNECTION_FLAG_INTERACTIVE;
         }
@@ -404,8 +401,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     private static boolean isMainThread() {
         // FIXME: There should be a better way to do this.
         // Would also be nice to have something that would work across Binder calls.
-//        Looper looper = Looper.myLooper();
-//        return looper != null && looper == Looper.getMainLooper();
+        //        Looper looper = Looper.myLooper();
+        //        return looper != null && looper == Looper.getMainLooper();
         return true;
     }
 
@@ -511,19 +508,18 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                            transaction begins, commits, or is rolled back, either
      *                            explicitly or by a call to {@link #yieldIfContendedSafely}.
      */
-    public void beginTransactionWithListenerNonExclusive(
-            SQLiteTransactionListener transactionListener) {
+    public void beginTransactionWithListenerNonExclusive(SQLiteTransactionListener transactionListener) {
         beginTransaction(transactionListener, false);
     }
 
     private void beginTransaction(SQLiteTransactionListener transactionListener, boolean exclusive) {
         acquireReference();
         try {
-//            getThreadSession().beginTransaction(
-//                    exclusive ? ShadowSQLiteSession.TRANSACTION_MODE_EXCLUSIVE :
-//                            ShadowSQLiteSession.TRANSACTION_MODE_IMMEDIATE,
-//                    transactionListener,
-//                    getThreadDefaultConnectionFlags(false /*readOnly*/), null);
+            //            getThreadSession().beginTransaction(
+            //                    exclusive ? ShadowSQLiteSession.TRANSACTION_MODE_EXCLUSIVE :
+            //                            ShadowSQLiteSession.TRANSACTION_MODE_IMMEDIATE,
+            //                    transactionListener,
+            //                    getThreadDefaultConnectionFlags(false /*readOnly*/), null);
             isTransaction = true;
             mConnection.setAutoCommit(false);
         } catch (java.sql.SQLException e) {
@@ -540,7 +536,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public void endTransaction() {
         acquireReference();
         try {
-//            getThreadSession().endTransaction(null);
+            //            getThreadSession().endTransaction(null);
             isTransaction = false;
 
             // 提交
@@ -566,7 +562,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public void setTransactionSuccessful() {
         acquireReference();
         try {
-//            getThreadSession().setTransactionSuccessful();
+            //            getThreadSession().setTransactionSuccessful();
             endTransaction();// 自己写的
         } finally {
             releaseReference();
@@ -581,7 +577,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public boolean inTransaction() {
         acquireReference();
         try {
-//            return getThreadSession().hasTransaction();
+            //            return getThreadSession().hasTransaction();
             return isTransaction;
         } finally {
             releaseReference();
@@ -603,7 +599,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public boolean isDbLockedByCurrentThread() {
         acquireReference();
         try {
-//            return getThreadSession().hasConnection();
+            //            return getThreadSession().hasConnection();
             try {
                 return mConnection != null && !mConnection.isClosed();
             } catch (java.sql.SQLException e) {
@@ -640,8 +636,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     @Deprecated
     public boolean yieldIfContended() {
-        return yieldIfContendedHelper(false /* do not check yielding */,
-                -1 /* sleepAfterYieldDelay */);
+        return yieldIfContendedHelper(false /* do not check yielding */, -1 /* sleepAfterYieldDelay */);
     }
 
     /**
@@ -752,8 +747,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     /**
      * Equivalent to openDatabase(path, factory, CREATE_IF_NECESSARY, errorHandler).
      */
-    public static ShadowSQLiteDatabase openOrCreateDatabase(String path, CursorFactory factory,
-                                                            DatabaseErrorHandler errorHandler) {
+    public static ShadowSQLiteDatabase openOrCreateDatabase(String path, CursorFactory factory, DatabaseErrorHandler errorHandler) {
         return openDatabase(path, factory, CREATE_IF_NECESSARY, errorHandler);
     }
 
@@ -811,15 +805,15 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                 return; // nothing to do
             }
 
-//            // Reopen the database in read-write mode.
-//            final int oldOpenFlags = mConfigurationLocked.openFlags;
-//            mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags & ~OPEN_READ_MASK) | OPEN_READWRITE;
-//            try {
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
-//            } catch (RuntimeException ex) {
-//                mConfigurationLocked.openFlags = oldOpenFlags;
-//                throw ex;
-//            }
+            //            // Reopen the database in read-write mode.
+            //            final int oldOpenFlags = mConfigurationLocked.openFlags;
+            //            mConfigurationLocked.openFlags = (mConfigurationLocked.openFlags & ~OPEN_READ_MASK) | OPEN_READWRITE;
+            //            try {
+            //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+            //            } catch (RuntimeException ex) {
+            //                mConfigurationLocked.openFlags = oldOpenFlags;
+            //                throw ex;
+            //            }
         }
     }
 
@@ -857,8 +851,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     private void openInner() {
         synchronized (mLock) {
             assert mConnectionPoolLocked == null;
-//            mConnectionPoolLocked = SQLiteConnectionPool.open(mConfigurationLocked);
-//            mCloseGuardLocked.open("close");
+            //            mConnectionPoolLocked = SQLiteConnectionPool.open(mConfigurationLocked);
+            //            mCloseGuardLocked.open("close");
         }
 
         synchronized (sActiveDatabases) {
@@ -879,36 +873,35 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     public static ShadowSQLiteDatabase create(CursorFactory factory) {
         // This is a magic string with special meaning for SQLite.
-        return openDatabase(SQLiteDatabaseConfiguration.MEMORY_DB_PATH,
-                factory, CREATE_IF_NECESSARY);
+        return openDatabase(SQLiteDatabaseConfiguration.MEMORY_DB_PATH, factory, CREATE_IF_NECESSARY);
     }
 
     // TODO: 17/6/1
-//    /**
-//     * Registers a CustomFunction callback as a function that can be called from
-//     * SQLite database triggers.
-//     *
-//     * @param name     the name of the sqlite3 function
-//     * @param numArgs  the number of arguments for the function
-//     * @param function callback to call when the function is executed
-//     * @hide
-//     */
-//    public void addCustomFunction(String name, int numArgs, CustomFunction function) {
-//        // Create wrapper (also validates arguments).
-//        SQLiteCustomFunction wrapper = new SQLiteCustomFunction(name, numArgs, function);
-//
-//        synchronized (mLock) {
-//            throwIfNotOpenLocked();
-//
-//            mConfigurationLocked.customFunctions.add(wrapper);
-//            try {
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
-//            } catch (RuntimeException ex) {
-//                mConfigurationLocked.customFunctions.remove(wrapper);
-//                throw ex;
-//            }
-//        }
-//    }
+    //    /**
+    //     * Registers a CustomFunction callback as a function that can be called from
+    //     * SQLite database triggers.
+    //     *
+    //     * @param name     the name of the sqlite3 function
+    //     * @param numArgs  the number of arguments for the function
+    //     * @param function callback to call when the function is executed
+    //     * @hide
+    //     */
+    //    public void addCustomFunction(String name, int numArgs, CustomFunction function) {
+    //        // Create wrapper (also validates arguments).
+    //        SQLiteCustomFunction wrapper = new SQLiteCustomFunction(name, numArgs, function);
+    //
+    //        synchronized (mLock) {
+    //            throwIfNotOpenLocked();
+    //
+    //            mConfigurationLocked.customFunctions.add(wrapper);
+    //            try {
+    //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+    //            } catch (RuntimeException ex) {
+    //                mConfigurationLocked.customFunctions.remove(wrapper);
+    //                throw ex;
+    //            }
+    //        }
+    //    }
 
     /**
      * Gets the database version.
@@ -952,8 +945,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         if ((numBytes % pageSize) != 0) {
             numPages++;
         }
-        long newPageCount = ShadowDatabaseUtils.longForQuery(this, "PRAGMA max_page_count = " + numPages,
-                null);
+        long newPageCount = ShadowDatabaseUtils.longForQuery(this, "PRAGMA max_page_count = " + numPages, null);
         return newPageCount * pageSize;
     }
 
@@ -1049,7 +1041,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             ShadowSQLiteStatement shadowSQLiteStatement = new ShadowSQLiteStatement(this, sql, null);
 
             // SQLiteDatabase db, String sql, Object[] bindArgs
-            Class[] argTypes = new Class[]{SQLiteDatabase.class, String.class, Object[].class};
+            //            Class[] argTypes = new Class[]{SQLiteDatabase.class, String.class, Object[].class};
 
             // SQLiteStatement只有 public SQLiteStatement()构造函数
             return new CGLibProxy().getInstance(SQLiteStatement.class, shadowSQLiteStatement);
@@ -1089,11 +1081,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    public Cursor query(boolean distinct, String table, String[] columns,
-                        String selection, String[] selectionArgs, String groupBy,
-                        String having, String orderBy, String limit) {
-        return queryWithFactory(null, distinct, table, columns, selection, selectionArgs,
-                groupBy, having, orderBy, limit, null);
+    public Cursor query(boolean distinct, String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy,
+                        String limit) {
+        return queryWithFactory(null, distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit, null);
     }
 
     /**
@@ -1130,11 +1120,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    public Cursor query(boolean distinct, String table, String[] columns,
-                        String selection, String[] selectionArgs, String groupBy,
-                        String having, String orderBy, String limit, CancellationSignal cancellationSignal) {
-        return queryWithFactory(null, distinct, table, columns, selection, selectionArgs,
-                groupBy, having, orderBy, limit, cancellationSignal);
+    public Cursor query(boolean distinct, String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy,
+                        String limit, CancellationSignal cancellationSignal) {
+        return queryWithFactory(null, distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit, cancellationSignal);
     }
 
     /**
@@ -1169,12 +1157,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    public Cursor queryWithFactory(CursorFactory cursorFactory,
-                                   boolean distinct, String table, String[] columns,
-                                   String selection, String[] selectionArgs, String groupBy,
-                                   String having, String orderBy, String limit) {
-        return queryWithFactory(cursorFactory, distinct, table, columns, selection,
-                selectionArgs, groupBy, having, orderBy, limit, null);
+    public Cursor queryWithFactory(CursorFactory cursorFactory, boolean distinct, String table, String[] columns, String selection, String[] selectionArgs,
+                                   String groupBy, String having, String orderBy, String limit) {
+        return queryWithFactory(cursorFactory, distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit, null);
     }
 
     /**
@@ -1212,17 +1197,13 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    public Cursor queryWithFactory(CursorFactory cursorFactory,
-                                   boolean distinct, String table, String[] columns,
-                                   String selection, String[] selectionArgs, String groupBy,
-                                   String having, String orderBy, String limit, CancellationSignal cancellationSignal) {
+    public Cursor queryWithFactory(CursorFactory cursorFactory, boolean distinct, String table, String[] columns, String selection, String[] selectionArgs,
+                                   String groupBy, String having, String orderBy, String limit, CancellationSignal cancellationSignal) {
         acquireReference();
         try {
-            String sql = ShadowSQLiteQueryBuilder.buildQueryString(
-                    distinct, table, columns, selection, groupBy, having, orderBy, limit);
+            String sql = ShadowSQLiteQueryBuilder.buildQueryString(distinct, table, columns, selection, groupBy, having, orderBy, limit);
 
-            return rawQueryWithFactory(cursorFactory, sql, selectionArgs,
-                    findEditTable(table), cancellationSignal);
+            return rawQueryWithFactory(cursorFactory, sql, selectionArgs, findEditTable(table), cancellationSignal);
         } finally {
             releaseReference();
         }
@@ -1256,12 +1237,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    public Cursor query(String table, String[] columns, String selection,
-                        String[] selectionArgs, String groupBy, String having,
-                        String orderBy) {
+    public Cursor query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
 
-        return query(false, table, columns, selection, selectionArgs, groupBy,
-                having, orderBy, null /* limit */);
+        return query(false, table, columns, selection, selectionArgs, groupBy, having, orderBy, null /* limit */);
     }
 
     /**
@@ -1294,12 +1272,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    public Cursor query(String table, String[] columns, String selection,
-                        String[] selectionArgs, String groupBy, String having,
-                        String orderBy, String limit) {
+    public Cursor query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy, String limit) {
 
-        return query(false, table, columns, selection, selectionArgs, groupBy,
-                having, orderBy, limit);
+        return query(false, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**
@@ -1329,8 +1304,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    public Cursor rawQuery(String sql, String[] selectionArgs,
-                           CancellationSignal cancellationSignal) {
+    public Cursor rawQuery(String sql, String[] selectionArgs, CancellationSignal cancellationSignal) {
         return rawQueryWithFactory(null, sql, selectionArgs, null, cancellationSignal);
     }
 
@@ -1346,9 +1320,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    public Cursor rawQueryWithFactory(
-            CursorFactory cursorFactory, String sql, String[] selectionArgs,
-            String editTable) {
+    public Cursor rawQueryWithFactory(CursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable) {
         return rawQueryWithFactory(cursorFactory, sql, selectionArgs, editTable, null);
     }
 
@@ -1367,8 +1339,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    public Cursor rawQueryWithFactory(CursorFactory cursorFactory, String sql, String[] selectionArgs,
-                                      String editTable, CancellationSignal cancellationSignal) {
+    public Cursor rawQueryWithFactory(CursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable, CancellationSignal cancellationSignal) {
         acquireReference();
         try {
             ShadowSQLiteDirectCursorDriver driver = new ShadowSQLiteDirectCursorDriver(this, sql, editTable, cancellationSignal);
@@ -1380,7 +1351,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
     public boolean checkExist(String table) {
         try {
-//            String sql = "SELECT COUNT(*) AS c FROM sqlite_master WHERE type ='table' AND name ='" + table + "' ";
+            //            String sql = "SELECT COUNT(*) AS c FROM sqlite_master WHERE type ='table' AND name ='" + table + "' ";
             String sql = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='" + table + "';";
 
             Statement statement = mConnection.createStatement();
@@ -1470,8 +1441,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     public long replace(String table, String nullColumnHack, ContentValues initialValues) {
         try {
-            return insertWithOnConflict(table, nullColumnHack, initialValues,
-                    CONFLICT_REPLACE);
+            return insertWithOnConflict(table, nullColumnHack, initialValues, CONFLICT_REPLACE);
         } catch (SQLException e) {
             Log.e(TAG, "Error inserting " + initialValues, e);
             return -1;
@@ -1517,8 +1487,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * input parameter <code>conflictAlgorithm</code> = {@link #CONFLICT_IGNORE}
      * or an error occurred.
      */
-    public long insertWithOnConflict(String table, String nullColumnHack,
-                                     ContentValues initialValues, int conflictAlgorithm) {
+    public long insertWithOnConflict(String table, String nullColumnHack, ContentValues initialValues, int conflictAlgorithm) {
         acquireReference();
         try {
             StringBuilder sql = new StringBuilder();
@@ -1580,24 +1549,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         String countQuery = "SELECT COUNT(*) FROM " + table;
 
         try {
-            Statement statement = mConnection.createStatement();
-            ResultSet rs        = statement.executeQuery(countQuery);
+            ShadowSQLiteStatement shadowSQLiteStatement  = new ShadowSQLiteStatement(this,countQuery,null);
 
-            int count = 0;
-
-            if (rs != null && rs.next()) {
-                ResultSetMetaData rsmd        = rs.getMetaData();
-                int               columnCount = rsmd.getColumnCount();
-
-                if (columnCount > 0) {
-                    count = rs.getInt(1);
-                }
-            }
-
-            statement.close();
-            rs.close();
-
-            return count;
+            return shadowSQLiteStatement.simpleQueryForLong();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1620,18 +1574,11 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
     public int delete(String table, String whereClause, String[] whereArgs) {
         acquireReference();
         try {
-            long beforeCount = getRows(table);
+            String sql = "DELETE FROM " + table + (!TextUtils.isEmpty(whereClause) ? " WHERE " + whereClause : "");
 
-            // 处理where语句
-            String afterWhere = KbSqlBuilder.bindArgs(whereClause, (Object[]) whereArgs);
-            String sql        = "DELETE FROM " + table + (!TextUtils.isEmpty(afterWhere) ? " WHERE " + afterWhere : "");
+            ShadowSQLiteStatement statement = new ShadowSQLiteStatement(this, sql, whereArgs);
 
-            debug(sql);
-            execSQL(sql);
-
-            long afterCount = getRows(table);
-
-            return (int) Math.abs(beforeCount - afterCount);
+            return statement.executeUpdateDelete();
         } finally {
             releaseReference();
         }
@@ -1809,25 +1756,17 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                 }
             }
 
-            // TODO: 17/6/8 估计有bug
-            String afterSql = (bindArgs == null || bindArgs.length == 0) ? sql : KbSqlBuilder.bindArgs(sql, bindArgs);
-
-            debug(afterSql);
-
+            ShadowSQLiteStatement statement = new ShadowSQLiteStatement(this, sql, bindArgs);
             try {
-                Statement statement = mConnection.createStatement();
-                statement.execute(afterSql);
-
-                if (!isTransaction) {
-                    mConnection.commit();
+                // PRAGMA user_version = x
+                if (sql.startsWith("PRAGMA") && sql.contains("=")) {
+                    statement.execute();
+                    return 1;
                 }
-
+                return statement.executeUpdateDelete();
+            } finally {
                 statement.close();
-            } catch (java.sql.SQLException e) {
-                throw new android.database.SQLException("", e);
             }
-
-            return 0;
         } finally {
             releaseReference();
         }
@@ -1844,8 +1783,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @throws SQLiteException if {@code sql} is invalid
      */
     public void validateSql(@NonNull String sql, @Nullable CancellationSignal cancellationSignal) {
-        getThreadSession().prepare(sql,
-                getThreadDefaultConnectionFlags(/* readOnly =*/ true), cancellationSignal, null);
+        getThreadSession().prepare(sql, getThreadDefaultConnectionFlags(/* readOnly =*/ true), cancellationSignal, null);
     }
 
     /**
@@ -1928,7 +1866,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             mConfigurationLocked.locale = locale;
             try {
                 // TODO: 17/6/6  
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.locale = oldLocale;
                 throw ex;
@@ -1951,8 +1889,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     public void setMaxSqlCacheSize(int cacheSize) {
         if (cacheSize > MAX_SQL_CACHE_SIZE || cacheSize < 0) {
-            throw new IllegalStateException(
-                    "expected value between 0 and " + MAX_SQL_CACHE_SIZE);
+            throw new IllegalStateException("expected value between 0 and " + MAX_SQL_CACHE_SIZE);
         }
 
         synchronized (mLock) {
@@ -1962,7 +1899,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             mConfigurationLocked.maxSqlCacheSize = cacheSize;
             try {
                 // TODO: 17/6/6
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.maxSqlCacheSize = oldMaxSqlCacheSize;
                 throw ex;
@@ -2009,7 +1946,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             mConfigurationLocked.foreignKeyConstraintsEnabled = enable;
             try {
                 // TODO: 17/6/6  
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.foreignKeyConstraintsEnabled = !enable;
                 throw ex;
@@ -2112,8 +2049,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             // doesn't work for databases with attached databases
             if (mHasAttachedDbsLocked) {
                 if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, "this database: " + mConfigurationLocked.label
-                            + " has attached databases. can't  enable WAL.");
+                    Log.d(TAG, "this database: " + mConfigurationLocked.label + " has attached databases. can't  enable WAL.");
                 }
                 return false;
             }
@@ -2121,7 +2057,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             mConfigurationLocked.openFlags |= ENABLE_WRITE_AHEAD_LOGGING;
             try {
                 // TODO: 17/6/6  
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.openFlags &= ~ENABLE_WRITE_AHEAD_LOGGING;
                 throw ex;
@@ -2149,7 +2085,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             mConfigurationLocked.openFlags &= ~ENABLE_WRITE_AHEAD_LOGGING;
             try {
                 // TODO: 17/6/6  
-//                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
+                //                mConnectionPoolLocked.reconfigure(mConfigurationLocked);
             } catch (RuntimeException ex) {
                 mConfigurationLocked.openFlags |= ENABLE_WRITE_AHEAD_LOGGING;
                 throw ex;
@@ -2176,25 +2112,25 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         return mConnection;
     }
 
-//    /**
-//     * Collect statistics about all open databases in the current process.
-//     * Used by bug report.
-//     */
-//    static ArrayList<DbStats> getDbStats() {
-//        ArrayList<DbStats> dbStatsList = new ArrayList<DbStats>();
-//        for (ShadowSQLiteDatabase db : getActiveDatabases()) {
-//            db.collectDbStats(dbStatsList);
-//        }
-//        return dbStatsList;
-//    }
+    //    /**
+    //     * Collect statistics about all open databases in the current process.
+    //     * Used by bug report.
+    //     */
+    //    static ArrayList<DbStats> getDbStats() {
+    //        ArrayList<DbStats> dbStatsList = new ArrayList<DbStats>();
+    //        for (ShadowSQLiteDatabase db : getActiveDatabases()) {
+    //            db.collectDbStats(dbStatsList);
+    //        }
+    //        return dbStatsList;
+    //    }
 
-//    private void collectDbStats(ArrayList<DbStats> dbStatsList) {
-//        synchronized (mLock) {
-//            if (mConnectionPoolLocked != null) {
-//                mConnectionPoolLocked.collectDbStats(dbStatsList);
-//            }
-//        }
-//    }
+    //    private void collectDbStats(ArrayList<DbStats> dbStatsList) {
+    //        synchronized (mLock) {
+    //            if (mConnectionPoolLocked != null) {
+    //                mConnectionPoolLocked.collectDbStats(dbStatsList);
+    //            }
+    //        }
+    //    }
 
     private static ArrayList<ShadowSQLiteDatabase> getActiveDatabases() {
         ArrayList<ShadowSQLiteDatabase> databases = new ArrayList<ShadowSQLiteDatabase>();
@@ -2219,7 +2155,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             if (mConnectionPoolLocked != null) {
                 printer.println("");
                 // TODO: 17/6/6
-//                mConnectionPoolLocked.dump(printer, verbose);
+                //                mConnectionPoolLocked.dump(printer, verbose);
             }
         }
     }
@@ -2299,8 +2235,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             try {
                 attachedDbs = getAttachedDbs();
                 if (attachedDbs == null) {
-                    throw new IllegalStateException("databaselist for: " + getPath() + " couldn't " +
-                            "be retrieved. probably because the database is closed");
+                    throw new IllegalStateException("databaselist for: " + getPath() + " couldn't " + "be retrieved. probably because the database is closed");
                 }
             } catch (SQLiteException e) {
                 // can't get attachedDb list. do integrity check on the main database
@@ -2320,7 +2255,8 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                         return false;
                     }
                 } finally {
-                    if (prog != null) prog.close();
+                    if (prog != null)
+                        prog.close();
                 }
             }
         } finally {
@@ -2336,8 +2272,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
     private void throwIfNotOpenLocked() {
         if (mConnectionPoolLocked == null) {
-            throw new IllegalStateException("The database '" + mConfigurationLocked.label
-                    + "' is not open.");
+            throw new IllegalStateException("The database '" + mConfigurationLocked.label + "' is not open.");
         }
     }
 
@@ -2358,9 +2293,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      */
     public interface CursorFactory {
 
-        Cursor newCursor(ShadowSQLiteDatabase db,
-                         ShadowSQLiteDirectCursorDriver masterQuery, String editTable,
-                         ShadowSQLiteQuery query);
+        Cursor newCursor(ShadowSQLiteDatabase db, ShadowSQLiteDirectCursorDriver masterQuery, String editTable, ShadowSQLiteQuery query);
     }
 
     /**

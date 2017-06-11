@@ -43,7 +43,7 @@ import java.util.Set;
 public class KbSqlParser {
 
     public static String bindArgs(String sql, @Nullable Object[] bindArgs) {
-        if (bindArgs == null || bindArgs.length == 0) {
+        if (bindArgs == null || bindArgs.length == 0 || sql.startsWith("PRAGMA")) {
             return sql;
         }
 
@@ -276,7 +276,7 @@ public class KbSqlParser {
      * @return
      */
     protected static Set<Expression> findBindArgsExpressions(String sql) {
-        if (sql == null || sql.startsWith("PRAGMA")) {
+        if (sql == null || sql.startsWith("PRAGMA") || !sql.contains("?")) {
             return new LinkedHashSet<>();
         }
 
