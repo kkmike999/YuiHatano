@@ -17,7 +17,7 @@
 //
 //        System.out.println("openOrCreateDatabase");
 //
-//        return new CGLibProxy().getInstance(SQLiteDatabase.class, shadowSQLiteDatabase);
+//        return new CGLibProxy().proxy(SQLiteDatabase.class, shadowSQLiteDatabase);
 //    }
 //
 //    /**

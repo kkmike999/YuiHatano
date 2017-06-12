@@ -1042,7 +1042,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             //            Class[] argTypes = new Class[]{SQLiteDatabase.class, String.class, Object[].class};
 
             // SQLiteStatement只有 public SQLiteStatement()构造函数
-            return new CGLibProxy().getInstance(SQLiteStatement.class, shadowSQLiteStatement);
+            return new CGLibProxy().proxy(SQLiteStatement.class, shadowSQLiteStatement);
         } finally {
             releaseReference();
         }

@@ -9,7 +9,7 @@ import org.junit.Test;
 public class CGLibProxyTest {
     @Test
     public void getInstance() throws Exception {
-        A proxyA = new CGLibProxy().getInstance(A.class, new B());
+        A proxyA = new CGLibProxy().proxy(A.class, new B());
 
         Assert.assertTrue(proxyA instanceof A);
     }

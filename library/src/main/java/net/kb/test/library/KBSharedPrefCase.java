@@ -22,6 +22,8 @@ import java.util.Map;
 
 /**
  * Created by kkmike999 on 2017/05/25.
+ * <p>
+ * KBUnitTest单元测试Case
  */
 public class KBSharedPrefCase {
 
@@ -42,18 +44,14 @@ public class KBSharedPrefCase {
             createDbDir();
 
             ShadowResources shadowResources = new ShadowResources();
-            Resources       resources       = new CGLibProxy().getInstance(Resources.class, shadowResources, new Class[]{AssetManager.class, DisplayMetrics.class, Configuration.class}, new Object[]{null, null, null});
+            Resources       resources       = new CGLibProxy().proxy(Resources.class, shadowResources, new Class[]{AssetManager.class, DisplayMetrics.class, Configuration.class}, new Object[]{null, null, null});
             mShadowContext = new ShadowContext(resources);
 
-            mContext = new CGLibProxy().getInstance(Context.class, mShadowContext);
+            mContext = new CGLibProxy().proxy(Context.class, mShadowContext);
 
             // application
             ShadowApplication shadowApplication = new ShadowApplication(resources);
-            mApplication = new CGLibProxy().getInstance(Application.class, mShadowContext);
-            
-            shadowApplication.setApplication(mApplication);
-
-            mShadowContext.setMockContext(mContext);
+            mApplication = new CGLibProxy().proxy(Application.class, shadowApplication);
         }
 
         @Override

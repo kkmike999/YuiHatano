@@ -1,5 +1,7 @@
 package net.kb.test.library;
 
+import android.shadow.Shadow;
+
 import net.kb.test.library.utils.ReflectUtils;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -13,16 +15,16 @@ import java.lang.reflect.Method;
  */
 public class CGLibProxy implements MethodInterceptor {
 
-    private Object realObject;
+    private Object shadowObject;
 
     /**
      * 创建代理实例
      *
-     * @param realObject
+     * @param shadowObject shadow类，调用proxy类方法时，实际是执行shadow类方法
      * @return
      */
-    public <T> T getInstance(Class<T> clazz, Object realObject) {
-        this.realObject = realObject;
+    public <T> T proxy(Class<T> clazz, Object shadowObject) {
+        this.shadowObject = shadowObject;
 
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
@@ -30,17 +32,22 @@ public class CGLibProxy implements MethodInterceptor {
         enhancer.setCallback(this);
 
         // 创建代理对象
-        return (T) enhancer.create();
+        T proxy = (T) enhancer.create();
+
+        if (shadowObject instanceof Shadow) {
+            ((Shadow) shadowObject).setProxyObject(proxy);
+        }
+        return proxy;
     }
 
     /**
      * 创建代理实例
      *
-     * @param realObject
+     * @param shadowObject shadow类，调用proxy类方法时，实际是执行shadow类方法
      * @return
      */
-    public <T> T getInstance(Class<T> clazz, Object realObject, Class[] argTypes, Object[] args) {
-        this.realObject = realObject;
+    public <T> T proxy(Class<T> clazz, Object shadowObject, Class[] argTypes, Object[] args) {
+        this.shadowObject = shadowObject;
 
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
@@ -48,7 +55,12 @@ public class CGLibProxy implements MethodInterceptor {
         enhancer.setCallback(this);
 
         // 创建代理对象
-        return (T) enhancer.create(argTypes, args);
+        T proxy = (T) enhancer.create(argTypes, args);
+
+        if (this.shadowObject instanceof Shadow) {
+            ((Shadow) this.shadowObject).setProxyObject(proxy);
+        }
+        return proxy;
     }
 
     /**
@@ -59,14 +71,14 @@ public class CGLibProxy implements MethodInterceptor {
         Class[] paramTypes = method.getParameterTypes();
 
         // 找到realObject对象中，一模一样的方法
-        Method method2 = ReflectUtils.findMethod(realObject.getClass(), method.getName(), paramTypes);
+        Method method2 = ReflectUtils.findMethod(shadowObject.getClass(), method.getName(), paramTypes);
 
         if (method2 == null) {
-            throw new RuntimeException("method \'" + realObject.getClass() + "." + method.getName() + "\' not found.");
+            throw new RuntimeException("method \'" + shadowObject.getClass() + "." + method.getName() + "\' not found.");
         }
 
         try {
-            return method2.invoke(realObject, args);
+            return method2.invoke(shadowObject, args);
         } catch (InvocationTargetException e) {
             Throwable targetEx = e.getTargetException();
 

@@ -6,6 +6,7 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.ShadowSQLiteDatabase;
 import android.os.Build;
+import android.shadow.Shadow;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 /**
  * Created by kkmike999 on 2017/05/26.
  */
-public class ShadowContext {
+public class ShadowContext implements Shadow {
 
     private Resources resources;
     private Context   mockContext;
@@ -40,10 +41,6 @@ public class ShadowContext {
 
     public SharedPreferences getSharedPreferences(String name, int mode) {
         return SharedPreferencesHelper.getInstance(name);
-    }
-
-    public void setMockContext(Context mockContext) {
-        this.mockContext = mockContext;
     }
 
     public Context getApplicationContext() {
@@ -69,7 +66,7 @@ public class ShadowContext {
             String path = DbPathUtils.getDbPath(name);
 
             ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
-            SQLiteDatabase       db  = new CGLibProxy().getInstance(SQLiteDatabase.class, sdb);
+            SQLiteDatabase       db  = new CGLibProxy().proxy(SQLiteDatabase.class, sdb);
 
             sdb.setMockDatabase(db);
 
@@ -90,5 +87,10 @@ public class ShadowContext {
     @Override
     public String toString() {
         return "ShadowContext@" + hashCode() + "{}";
+    }
+
+    @Override
+    public void setProxyObject(Object proxyObject) {
+        mockContext = (Context) proxyObject;
     }
 }

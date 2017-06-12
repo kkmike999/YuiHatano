@@ -9,7 +9,7 @@ import android.content.res.Resources;
  */
 public class ShadowApplication extends ShadowContext {
 
-    Application mockApplication;
+    Application shadowApplication;
 
     public ShadowApplication(Resources resources) {
         super(resources);
@@ -17,10 +17,13 @@ public class ShadowApplication extends ShadowContext {
 
     @Override
     public Context getApplicationContext() {
-        return mockApplication;
+        return shadowApplication;
     }
 
-    public void setApplication(Application application) {
-        this.mockApplication = application;
+    @Override
+    public void setProxyObject(Object proxyObject) {
+        super.setProxyObject(proxyObject);
+
+        shadowApplication = (Application) proxyObject;
     }
 }

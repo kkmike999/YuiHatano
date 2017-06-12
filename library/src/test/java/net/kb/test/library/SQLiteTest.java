@@ -27,7 +27,7 @@ public class SQLiteTest {
     public void setUp() throws Exception {
         sdb = new ShadowSQLiteDatabase("build/db/sample.db", 0, null);//ShadowSQLiteDatabaseHelper.newSqliteDatabase();
 
-        db = new CGLibProxy().getInstance(SQLiteDatabase.class, sdb);
+        db = new CGLibProxy().proxy(SQLiteDatabase.class, sdb);
     }
 
     @After
