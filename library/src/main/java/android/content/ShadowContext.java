@@ -1,7 +1,9 @@
 package android.content;
 
 import android.annotation.TargetApi;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.content.res.ShadowAssetManager;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.ShadowSQLiteDatabase;
@@ -14,6 +16,7 @@ import net.kb.test.library.CGLibProxy;
 import net.kb.test.library.utils.DbPathUtils;
 import net.kkmike.sptest.SharedPreferencesHelper;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +50,14 @@ public class ShadowContext implements Shadow {
         return mockContext;
     }
 
+    public File getDatabasePath(String name) {
+        return new File("build/db");
+    }
+
+    public AssetManager getAssets() {
+        return new CGLibProxy().proxy(AssetManager.class, new ShadowAssetManager());
+    }
+
     /////////////////////////////   SQLiteDatabase    /////////////////////////////
     public void putSQLiteDatabase(String name, SQLiteDatabase db) {
         dbMap.put(name, db);
@@ -76,6 +87,18 @@ public class ShadowContext implements Shadow {
         } catch (java.sql.SQLException e) {
             throw new android.database.SQLException("", e);
         }
+    }
+
+    public boolean deleteDatabase(String name) {
+        SQLiteDatabase db = dbMap.get(name);
+//        db.execSQL("DROP DATABASE " + name);
+        db.close();
+
+        String path = DbPathUtils.getDbPath(name);
+
+        new File(path).delete();
+
+        return true;
     }
 
     public Map<String, SQLiteDatabase> getDbMap() {

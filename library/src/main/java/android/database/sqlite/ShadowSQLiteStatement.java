@@ -41,7 +41,7 @@ import java.sql.Statement;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
 
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
     Connection mConnection;
     Statement  mStatement;
