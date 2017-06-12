@@ -11,7 +11,7 @@ buildscript {
 
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
-        classpath 'com.novoda:bintray-release:0.3.4'
+        classpath 'com.novoda:bintray-release:0.4.0'
     }
 }
 
@@ -21,9 +21,15 @@ allprojects {
         jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        maven { url "https://dl.bintray.com/kkmike999/maven" }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task javadoc(type: Javadoc) {
+    options.encoding = "utf-8"
+}
+tasks.getByPath(":library:releaseAndroidJavadocs").enabled = false

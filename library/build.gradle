@@ -53,12 +53,8 @@ dependencies {
 publish {
     userOrg = BINTRAY_USER_NAME      //bintray注册的用户名
     groupId = 'net.kb.test'         //compile引用时的第1部分groupId
-    artifactId = 'library'     //compile引用时的第2部分项目名
+    artifactId = 'kb_unit_test'     //compile引用时的第2部分项目名
     publishVersion = '0.1'    //compile引用时的第3部分版本号
     desc = 'Android DAO单元测试框架'
-    website = 'https://github.com/tsy12321/MyOkHttp'
-}
-
-task javadoc(type: Javadoc) {
-    options.encoding = "utf-8"
+    website = 'http://www.jianshu.com/u/0ef3dc77079c'
 }
