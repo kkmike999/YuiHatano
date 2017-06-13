@@ -1,6 +1,6 @@
 package net.kb.test.library.testCase;
 
-import net.kb.test.library.KBSharedPrefCase;
+import net.kb.test.library.KBCase;
 import net.kb.test.library.dbflow.DbFlowUtils;
 
 import org.junit.Rule;
@@ -11,7 +11,7 @@ import org.junit.rules.ExternalResource;
  * <p>
  * DbFlow Case
  */
-public class DbFlowCase extends KBSharedPrefCase {
+public class DbFlowCase extends KBCase {
 
     @Rule
     public ExternalResource innerRule = new ExternalResource() {

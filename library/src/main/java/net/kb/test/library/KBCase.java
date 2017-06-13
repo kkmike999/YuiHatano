@@ -25,7 +25,7 @@ import java.util.Map;
  * <p>
  * KBUnitTest单元测试Case
  */
-public class KBSharedPrefCase {
+public class KBCase {
 
     protected boolean DEBUG = false;
 
@@ -39,7 +39,7 @@ public class KBSharedPrefCase {
         @Override
         protected void before() throws Throwable {
             if (DEBUG) {
-                System.out.println("KBSharedPrefCase before");
+                System.out.println("KBCase before");
             }
             System.out.println();
             // android sdk Resource只有这个构造函数
@@ -63,7 +63,7 @@ public class KBSharedPrefCase {
         @Override
         protected void after() {
             if (DEBUG) {
-                System.out.println("KBSharedPrefCase after");
+                System.out.println("KBCase after");
             }
             Map<String, SQLiteDatabase> dbMap = mShadowContext.getDbMap();
 

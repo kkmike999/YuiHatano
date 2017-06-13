@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * Created by kkmike999 on 2017/06/06.
  */
-public class KBSharedPrefCaseTest extends KBSharedPrefCase {
+public class KBCaseTest extends KBCase {
     private Context mContext;
 
     @Before

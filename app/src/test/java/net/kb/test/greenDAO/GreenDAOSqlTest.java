@@ -3,7 +3,7 @@ package net.kb.test.greenDAO;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.kb.test.library.KBSharedPrefCase;
+import net.kb.test.library.KBCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * Created by kkmike999 on 2017/06/09.
  */
-public class GreenDAOSqlTest extends KBSharedPrefCase {
+public class GreenDAOSqlTest extends KBCase {
 
     SQLiteDatabase database;
 

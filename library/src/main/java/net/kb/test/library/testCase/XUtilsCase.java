@@ -1,6 +1,6 @@
 package net.kb.test.library.testCase;
 
-import net.kb.test.library.KBSharedPrefCase;
+import net.kb.test.library.KBCase;
 import net.kb.test.library.xutils.XUtilsDbUtils;
 
 import org.junit.Rule;
@@ -10,7 +10,7 @@ import org.junit.rules.ExternalResource;
 /**
  * Created by kkmike999 on 2017/06/13.
  */
-public class XUtilsCase extends KBSharedPrefCase {
+public class XUtilsCase extends KBCase {
 
     @Rule
     public ExternalResource xutilsRule = new ExternalResource() {
