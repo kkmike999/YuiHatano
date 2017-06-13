@@ -9,36 +9,24 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 
 import net.kb.test.bean.UserModel;
 import net.kb.test.bean.UserModel_Table;
-import net.kb.test.library.KBSharedPrefCase;
+import net.kb.test.library.testCase.DbFlowCase;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Random;
 
 /**
  * Created by kkmike999 on 2017/06/12.
  */
-//@RunWith(RobolectricTestRunner.class)
-//@Config(constants = BuildConfig.class)
-public class DbFlowTest extends KBSharedPrefCase {
+public class DbFlowTest extends DbFlowCase {
 
     @Before
     public void setUp() throws Exception {
-        FlowManager.destroy();
         FlowManager.init(new FlowConfig.Builder(getApplication()).build());
 
         Assert.assertEquals(0, new Select(Method.count()).from(UserModel.class).count());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        FlowManager.destroy();
-
-        new File("build/test.dp").delete();
     }
 
     @Test

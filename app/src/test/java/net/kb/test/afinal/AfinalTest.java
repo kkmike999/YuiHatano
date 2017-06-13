@@ -3,11 +3,9 @@ package net.kb.test.afinal;
 import android.content.Context;
 
 import net.kb.test.bean.Bean;
-import net.kb.test.library.KBSharedPrefCase;
-import net.kb.test.library.afinal.FinalDbUtils;
+import net.kb.test.library.testCase.AFinalCase;
 import net.tsz.afinal.FinalDb;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,22 +16,15 @@ import java.util.Random;
 /**
  * Created by kkmike999 on 2017/06/07.
  */
-public class AfinalTest extends KBSharedPrefCase {
+public class AfinalTest extends AFinalCase {
 
     FinalDb finalDb;
 
     @Before
     public void setUp() throws Exception {
-        Context       context       = getContext();
+        Context context = getContext();
 
         finalDb = FinalDb.create(context, false);
-
-//        ShadowSQLiteDatabase.DEBUG = false;
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        FinalDbUtils.clear();
     }
 
     @Test

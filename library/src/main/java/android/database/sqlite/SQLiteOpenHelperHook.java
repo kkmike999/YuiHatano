@@ -9,13 +9,5 @@ public class SQLiteOpenHelperHook {
 
     public static void setDebug(boolean isDebug) {
         DEBUG = isDebug;
-//        try {
-//            Field debugField = SQLiteOpenHelper.class.getDeclaredField("DEBUG");
-//            debugField.setAccessible(true);
-//
-//            debugField.set(null, isDebug);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 }

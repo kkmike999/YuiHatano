@@ -1,5 +1,7 @@
 package net.kb.test.library.xutils;
 
+import android.app.Application;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -23,6 +25,17 @@ public class XUtilsDbUtils {
             if (XUtilsDbUtils.DEBUG) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void init(Application app) {
+        try {
+            Method initMethod = Class.forName("org.xutils.x$Ext").getDeclaredMethod("init", Application.class);
+            initMethod.setAccessible(true);
+
+            initMethod.invoke(null, app);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -3,17 +3,16 @@ package net.kb.test.greenDAO;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelperHook;
 
 import net.kb.test.bean.DaoMaster;
 import net.kb.test.bean.DaoSession;
 import net.kb.test.bean.User;
 import net.kb.test.bean.UserDao;
-import net.kb.test.library.KBSharedPrefCase;
+import net.kb.test.library.testCase.GreenDAOCase;
+import net.kb.test.library.utils.DebugHook;
 
 import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -24,16 +23,14 @@ import java.util.List;
 /**
  * Created by kkmike999 on 2017/06/08.
  */
-//@RunWith(RobolectricTestRunner.class)
-//@Config(constants = BuildConfig.class)
-public class GreenDAOTest extends KBSharedPrefCase {
+public class GreenDAOTest extends GreenDAOCase {
 
     private DaoSession mDaoSession;
     private UserDao    mUserDAO;
 
     @BeforeClass
     public static void beforeClass() {
-        SQLiteOpenHelperHook.setDebug(true);
+        DebugHook.setDebug(true);
     }
 
     @Before
@@ -51,11 +48,6 @@ public class GreenDAOTest extends KBSharedPrefCase {
         mDaoSession = daoMaster.newSession();
 
         mUserDAO = mDaoSession.getUserDao();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        mUserDAO.dropTable(mDaoSession.getDatabase(), true);
     }
 
     @Test

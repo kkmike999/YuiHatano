@@ -27,6 +27,8 @@ import java.util.Map;
  */
 public class KBSharedPrefCase {
 
+    protected boolean DEBUG = false;
+
     private Context       mContext;
     private Application   mApplication;
     private ShadowContext mShadowContext;
@@ -36,6 +38,10 @@ public class KBSharedPrefCase {
 
         @Override
         protected void before() throws Throwable {
+            if (DEBUG) {
+                System.out.println("KBSharedPrefCase before");
+            }
+            System.out.println();
             // android sdk Resource只有这个构造函数
             // public Resources(AssetManager assets, DisplayMetrics metrics, Configuration config)
 
@@ -56,13 +62,16 @@ public class KBSharedPrefCase {
 
         @Override
         protected void after() {
+            if (DEBUG) {
+                System.out.println("KBSharedPrefCase after");
+            }
             Map<String, SQLiteDatabase> dbMap = mShadowContext.getDbMap();
 
-            for (String dbName : dbMap.keySet()) {
+            for (SQLiteDatabase db : dbMap.values()) {
                 // 关闭数据库
-                dbMap.get(dbName).close();
+                db.close();
 
-                String dbPath = DbPathUtils.getDbPath(dbName);
+                String dbPath = db.getPath();
 
                 // 删除临时数据库文件
                 new File(dbPath).delete();
@@ -100,15 +109,15 @@ public class KBSharedPrefCase {
         }
     };
 
-    public Context getContext() {
+    protected Context getContext() {
         return mContext;
     }
 
-    public ShadowContext getShadowContext() {
+    protected ShadowContext getShadowContext() {
         return mShadowContext;
     }
 
-    public Application getApplication() {
+    protected Application getApplication() {
         return mApplication;
     }
 

@@ -41,7 +41,8 @@ import java.sql.Statement;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG        = true;
+    public static boolean DEBUG_PRAGMA = false;
 
     Connection mConnection;
     Statement  mStatement;
@@ -334,8 +335,15 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
         }
     }
 
-    protected void debug(CharSequence sql) {
+    protected void debug(String sql) {
         if (DEBUG) {
+            if (sql.startsWith("PRAGMA")) {
+                if (DEBUG_PRAGMA) {
+                    System.out.println(sql);
+                }
+                return;
+            }
+
             System.out.println(sql);
         }
     }

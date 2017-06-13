@@ -1,10 +1,8 @@
 package net.kb.test.xutils;
 
 import net.kb.test.bean.Parent;
-import net.kb.test.library.KBSharedPrefCase;
-import net.kb.test.library.xutils.XUtilsDbUtils;
+import net.kb.test.library.testCase.XUtilsCase;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,19 +16,17 @@ import org.xutils.x;
 /**
  * Created by kkmike999 on 2017/6/11.
  */
-public class XUtilsTest extends KBSharedPrefCase {
+public class XUtilsTest extends XUtilsCase {
 
     protected DbManager db;
 
     @Before
     public void setUp() throws Exception {
-        XUtilsDbUtils.setUp();
-
-        x.Ext.init(getApplication());
         x.Ext.setDebug(true); // 是否输出debug日志, 开启debug会影响性能.
+
         // 本地数据的初始化
         DbManager.DaoConfig daoConfig = new DbManager.DaoConfig().setDbName("xutils3_db") //设置数据库名
-                                                                 //设置数据库版本,每次启动应用时将会检查该版本号,
+                                                                 // 设置数据库版本,每次启动应用时将会检查该版本号,
                                                                  // 发现数据库版本低于这里设置的值将进行数据库升级并触发DbUpgradeListener
                                                                  .setDbVersion(1) //
                                                                  // .setDbDir(new File("build/db"))//设置数据库.db文件存放的目录,默认为包名下databases目录下
@@ -48,11 +44,6 @@ public class XUtilsTest extends KBSharedPrefCase {
                                                                      }
                                                                  });//设置数据库升级时的Listener,这里可以执行相关数据库表的相关修改,比如alter语句增加字段等
         db = x.getDb(daoConfig);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        XUtilsDbUtils.clearAndCloseAndDrop();
     }
 
     @Test
