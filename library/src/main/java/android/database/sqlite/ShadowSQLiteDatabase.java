@@ -1526,8 +1526,6 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
                 sql.append(')');
             }
 
-            debug(sql);
-
             // 执行语句
             execSQL(sql.toString());
 
@@ -2280,11 +2278,11 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
         }
     }
 
-    protected void err(CharSequence sql) {
-        if (DEBUG) {
-            System.err.println(sql);
-        }
-    }
+//    protected void err(CharSequence sql) {
+//        if (DEBUG) {
+//            System.err.println(sql);
+//        }
+//    }
 
     /**
      * Used to allow returning sub-classes of {@link Cursor} when calling query.

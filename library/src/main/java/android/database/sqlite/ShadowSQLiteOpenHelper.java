@@ -16,6 +16,8 @@ public class ShadowSQLiteOpenHelper {
     private static final String  TAG                   = SQLiteOpenHelper.class.getSimpleName();
     private static final boolean DEBUG_STRICT_READONLY = false;
 
+    public static boolean DEBUG = false;
+
     SQLiteOpenHelper mRealOpenHelper;
 
     private final Context                      mContext;
@@ -138,7 +140,7 @@ public class ShadowSQLiteOpenHelper {
     }
 
     private void debug(String msg) {
-        if (SQLiteOpenHelperHook.DEBUG) {
+        if (DEBUG) {
             System.out.println(msg);
         }
     }
