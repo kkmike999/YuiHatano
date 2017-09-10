@@ -1,8 +1,8 @@
-## KBUnitTest介绍
+## YuiHatano介绍
 
-**KBUnitTest**是一款轻量级DAO单元测试框架，开发者可以通过此框架，在Android Studio运行SQLiteDatabase、SharedPreference单元测试。
+**YuiHatano**是一款轻量级DAO单元测试框架，开发者可以通过此框架，在Android Studio运行SQLiteDatabase、SharedPreference单元测试。
 
-KBUnitTest支持原生SQLiteDatabase操作及GreenDAO、Afinal、XUtils、DbFlow第三方库。
+YuiHatano支持原生SQLiteDatabase操作及GreenDAO、Afinal、XUtils、DbFlow第三方库。
 
 ## 引用
 
@@ -20,7 +20,9 @@ allprojects {
 在module的**build.gradle**添加依赖：
 ```
 dependencies {
-    testCompile 'net.kb.test:kb_unit_test:0.2'
+    testCompile('net.yui:YuiHatano:0.1') {
+        exclude group: 'com.android.support'
+    }
 }
 ```
 
@@ -40,13 +42,13 @@ dependencies {
 ### 原生SQLiteDatabase
 
 ```
-public class SQLiteDatabaseTest extends KBCase {
+public class SQLiteDatabaseTest extends YuiCase {
 
     SQLiteDatabase db;
 
     @Before
     public void setUp() throws Exception {
-        // 使用KBUnitTest提供的Context，获取SQLiteDatabase实例
+        // 使用YuiHatano提供的Context，获取SQLiteDatabase实例
         db = getContext().openOrCreateDatabase("build/test.db", 0, null);
     }
 
