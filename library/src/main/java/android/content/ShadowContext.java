@@ -12,8 +12,8 @@ import android.shadow.Shadow;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
-import net.kb.test.library.CGLibProxy;
-import net.kb.test.library.utils.DbPathUtils;
+import net.yui.CGLibProxy;
+import net.yui.utils.DbPathUtils;
 import net.kkmike.sptest.SharedPreferencesHelper;
 
 import java.io.File;

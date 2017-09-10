@@ -2,7 +2,7 @@ package android.content.res;
 
 import net.kb.test.library.BuildConfig;
 import net.kb.test.library.R;
-import net.kb.test.library.utils.RoboRunner;
+import net.yui.utils.RoboRunner;
 
 import org.junit.Assert;
 import org.junit.Before;

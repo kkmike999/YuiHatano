@@ -1,4 +1,4 @@
-package net.kb.test.library.afinal;
+package net.yui.afinal;
 
 import java.lang.reflect.Field;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package net.kb.test.library.testCase;
+package net.yui.testCase;
 
 import net.kb.test.library.KBCase;
 

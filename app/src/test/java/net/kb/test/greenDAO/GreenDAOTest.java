@@ -7,8 +7,8 @@ import net.kb.test.bean.DaoMaster;
 import net.kb.test.bean.DaoSession;
 import net.kb.test.bean.User;
 import net.kb.test.bean.UserDao;
-import net.kb.test.library.testCase.GreenDAOCase;
-import net.kb.test.library.utils.DebugHook;
+import net.yui.testCase.GreenDAOCase;
+import net.yui.utils.DebugHook;
 
 import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;

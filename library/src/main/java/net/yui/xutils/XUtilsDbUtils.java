@@ -1,4 +1,4 @@
-package net.kb.test.library.xutils;
+package net.yui.xutils;
 
 import android.app.Application;
 

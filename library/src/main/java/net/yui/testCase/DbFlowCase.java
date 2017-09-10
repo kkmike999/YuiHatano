@@ -1,7 +1,7 @@
-package net.kb.test.library.testCase;
+package net.yui.testCase;
 
 import net.kb.test.library.KBCase;
-import net.kb.test.library.dbflow.DbFlowUtils;
+import net.yui.dbflow.DbFlowUtils;
 
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;

@@ -1,5 +1,7 @@
 package net.kb.test.library;
 
+import net.yui.CGLibProxy;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package net.kb.test.library.utils;
+package net.yui.utils;
 
 import android.database.sqlite.ShadowSQLiteDatabase;
 import android.database.sqlite.ShadowSQLiteOpenHelper;

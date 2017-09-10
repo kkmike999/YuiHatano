@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.ShadowSQLiteDatabase;
 
+import net.yui.CGLibProxy;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

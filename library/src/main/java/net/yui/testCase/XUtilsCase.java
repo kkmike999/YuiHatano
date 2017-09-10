@@ -1,7 +1,7 @@
-package net.kb.test.library.testCase;
+package net.yui.testCase;
 
 import net.kb.test.library.KBCase;
-import net.kb.test.library.xutils.XUtilsDbUtils;
+import net.yui.xutils.XUtilsDbUtils;
 
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;

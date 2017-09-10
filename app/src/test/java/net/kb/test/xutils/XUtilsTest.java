@@ -1,7 +1,7 @@
 package net.kb.test.xutils;
 
 import net.kb.test.bean.Parent;
-import net.kb.test.library.testCase.XUtilsCase;
+import net.yui.testCase.XUtilsCase;
 
 import org.junit.Assert;
 import org.junit.Before;

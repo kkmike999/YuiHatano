@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
@@ -60,9 +60,9 @@ dependencies {
 
 publish {
     userOrg = 'kkmike999'      //bintray注册的用户名
-    groupId = 'net.kb.test'         //compile引用时的第1部分groupId
-    artifactId = 'kb_unit_test'     //compile引用时的第2部分项目名
-    publishVersion = '0.2'    //compile引用时的第3部分版本号
+    groupId = 'net.yui'         //compile引用时的第1部分groupId
+    artifactId = 'yui'     //compile引用时的第2部分项目名
+    publishVersion = '1.0'    //compile引用时的第3部分版本号
     desc = 'Android DAO单元测试框架'
     website = 'http://www.jianshu.com/u/0ef3dc77079c'
 }

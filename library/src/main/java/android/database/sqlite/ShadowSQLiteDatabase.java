@@ -34,7 +34,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.Printer;
 
-import net.kb.test.library.CGLibProxy;
+import net.yui.CGLibProxy;
 
 import java.io.File;
 import java.io.FileFilter;

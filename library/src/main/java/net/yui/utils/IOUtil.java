@@ -1,4 +1,4 @@
-package net.kb.test.library.utils;
+package net.yui.utils;
 
 import java.io.Closeable;
 import java.io.Flushable;

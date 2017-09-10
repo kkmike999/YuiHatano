@@ -3,7 +3,7 @@ package net.kb.test.afinal;
 import android.content.Context;
 
 import net.kb.test.bean.Bean;
-import net.kb.test.library.testCase.AFinalCase;
+import net.yui.testCase.AFinalCase;
 import net.tsz.afinal.FinalDb;
 
 import org.junit.Assert;

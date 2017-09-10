@@ -1,4 +1,4 @@
-package net.kb.test.library.utils;
+package net.yui.utils;
 
 /**
  * Created by kkmike999 on 2017/06/08.

@@ -9,7 +9,7 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 
 import net.kb.test.bean.UserModel;
 import net.kb.test.bean.UserModel_Table;
-import net.kb.test.library.testCase.DbFlowCase;
+import net.yui.testCase.DbFlowCase;
 
 import org.junit.Assert;
 import org.junit.Before;

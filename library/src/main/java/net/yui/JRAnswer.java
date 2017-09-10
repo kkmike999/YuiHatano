@@ -1,6 +1,6 @@
-package net.kb.test.library;
+package net.yui;
 
-import net.kb.test.library.utils.ReflectUtils;
+import net.yui.utils.ReflectUtils;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;

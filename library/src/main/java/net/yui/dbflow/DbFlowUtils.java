@@ -1,4 +1,4 @@
-package net.kb.test.library.dbflow;
+package net.yui.dbflow;
 
 import java.lang.reflect.Method;
 
