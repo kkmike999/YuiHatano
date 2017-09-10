@@ -30,12 +30,12 @@ dependencies {
 
 在Android Studio操作栏，`Run`->`EditConfigurations`，双击`Defaults`，选择`Android JUnit`窗口，找到`Working directory`参数栏，点击最右边的`...`选择`MODULE_DIR`。
 
-![Run->EditConfigurations](http://i1.buimg.com/577986/8f74617583d40318.png)
-![Android Junit](http://i1.buimg.com/577986/c7e3195e23d05542.png)
-![选择MODULE_DIR](http://i1.buimg.com/577986/a3f34c4abf2b3d29.png)
+![Run->EditConfigurations](https://github.com/kkmike999/YuiHatano/blob/master/readme/images/Run-EditConfigurations.png?raw=true)
+![Android Junit](https://github.com/kkmike999/YuiHatano/blob/master/readme/images/Android%20Junit.png?raw=true)
+![选择MODULE_DIR](https://github.com/kkmike999/YuiHatano/blob/master/readme/images/select%20MODULE_DIR.png?raw=true)
 
 操作示范：
-![](http://i1.buimg.com/577986/9212b3b77bd0e7f0.gif)
+![](https://github.com/kkmike999/YuiHatano/blob/master/readme/images/operate.gif?raw=true)
 
 ## 使用方法
 
