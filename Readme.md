@@ -20,7 +20,7 @@ allprojects {
 在module的**build.gradle**添加依赖：
 ```
 dependencies {
-    testCompile('net.yui:YuiHatano:0.1') {
+    testCompile('net.yui:YuiHatano:1.0') {
         exclude group: 'com.android.support'
     }
 }
