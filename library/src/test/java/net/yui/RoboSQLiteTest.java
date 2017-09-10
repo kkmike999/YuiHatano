@@ -1,10 +1,8 @@
-package net.kb.test.library;
+package net.yui;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import net.yui.BuildConfig;
 
 import org.junit.Assert;
 import org.junit.Before;

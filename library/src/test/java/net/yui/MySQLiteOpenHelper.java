@@ -1,4 +1,4 @@
-package net.kb.test.library;
+package net.yui;
 
 import android.content.Context;
 import android.database.DatabaseErrorHandler;

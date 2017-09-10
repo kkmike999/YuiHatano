@@ -1,4 +1,4 @@
-package net.kb.test.library;
+package net.yui;
 
 /**
  * Created by kkmike999 on 2017/06/01.

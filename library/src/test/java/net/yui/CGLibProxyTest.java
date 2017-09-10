@@ -1,4 +1,4 @@
-package net.kb.test.library;
+package net.yui;
 
 import net.yui.CGLibProxy;
 

@@ -1,8 +1,8 @@
-package net.kb.test.library;
+package net.yui;
 
 import android.content.Context;
 
-import net.yui.R;
+import net.kb.test.library.KBCase;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,7 +21,7 @@ public class KBCaseTest extends KBCase {
 
     @Test
     public void testMethod() {
-        Assert.assertEquals("KBUnitTest", mContext.getString(R.string.test_string));
+        Assert.assertEquals("Yui Hatano", mContext.getString(R.string.test_string));
         System.out.println();
     }
 }

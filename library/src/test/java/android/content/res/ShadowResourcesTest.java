@@ -20,7 +20,7 @@ public class ShadowResourcesTest {
 
     @Test
     public void getString() throws Exception {
-        Assert.assertEquals("KBUnitTest", resources.getString(R.string.test_string));
+        Assert.assertEquals("Yui Hatano", resources.getString(R.string.test_string));
     }
 
     @Test
