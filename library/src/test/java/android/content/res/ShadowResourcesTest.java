@@ -1,6 +1,6 @@
 package android.content.res;
 
-import net.kb.test.library.R;
+import net.yui.R;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class ShadowResourcesTest {
 
     @Test
     public void getPackageName() throws Exception {
-        Assert.assertEquals("net.kb.test.library", resources.getPackageName());
+        Assert.assertEquals("net.yui", resources.getPackageName());
     }
 
 }

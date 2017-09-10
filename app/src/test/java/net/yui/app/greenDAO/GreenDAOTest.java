@@ -1,12 +1,12 @@
-package net.kb.test.greenDAO;
+package net.yui.app.greenDAO;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.kb.test.bean.DaoMaster;
-import net.kb.test.bean.DaoSession;
-import net.kb.test.bean.User;
-import net.kb.test.bean.UserDao;
+import net.yui.app.bean.DaoMaster;
+import net.yui.app.bean.DaoSession;
+import net.yui.app.bean.User;
+import net.yui.app.bean.UserDao;
 import net.yui.testCase.GreenDAOCase;
 import net.yui.utils.DebugHook;
 

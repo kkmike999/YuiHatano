@@ -2,6 +2,8 @@ package net.kb.test.library;
 
 import android.content.Context;
 
+import net.yui.R;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

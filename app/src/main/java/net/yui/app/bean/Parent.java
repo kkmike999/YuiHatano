@@ -1,4 +1,4 @@
-package net.kb.test.bean;
+package net.yui.app.bean;
 
 import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;

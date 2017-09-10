@@ -7,7 +7,6 @@ import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
-import net.kb.test.library.R;
 import net.yui.utils.FileReader;
 
 import org.jsoup.Jsoup;

@@ -1,4 +1,4 @@
-package net.kb.test.bean;
+package net.yui.app.bean;
 
 /**
  * Created by kkmike999 on 2017/06/07.

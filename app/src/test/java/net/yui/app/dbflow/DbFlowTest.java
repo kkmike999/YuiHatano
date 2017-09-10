@@ -1,4 +1,4 @@
-package net.kb.test.dbflow;
+package net.yui.app.dbflow;
 
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -7,8 +7,8 @@ import com.raizlabs.android.dbflow.sql.language.Method;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
-import net.kb.test.bean.UserModel;
-import net.kb.test.bean.UserModel_Table;
+import net.yui.app.bean.UserModel;
+import net.yui.app.bean.UserModel_Table;
 import net.yui.testCase.DbFlowCase;
 
 import org.junit.Assert;

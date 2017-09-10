@@ -1,11 +1,11 @@
-package net.kb.test.bean;
+package net.yui.app.bean;
 
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import net.kb.test.dbflow.DBFlowDatabase;
+import net.yui.app.dbflow.DBFlowDatabase;
 
 //@ModelContainer //表示可以直接解析JSON
 @Table(database = DBFlowDatabase.class)

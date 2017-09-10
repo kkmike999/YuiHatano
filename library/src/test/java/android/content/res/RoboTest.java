@@ -1,7 +1,7 @@
 package android.content.res;
 
-import net.kb.test.library.BuildConfig;
-import net.kb.test.library.R;
+import net.yui.BuildConfig;
+import net.yui.R;
 import net.yui.utils.RoboRunner;
 
 import org.junit.Assert;

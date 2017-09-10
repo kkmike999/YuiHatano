@@ -1,8 +1,8 @@
-package net.kb.test.afinal;
+package net.yui.app.afinal;
 
 import android.content.Context;
 
-import net.kb.test.bean.Bean;
+import net.yui.app.bean.Bean;
 import net.yui.testCase.AFinalCase;
 import net.tsz.afinal.FinalDb;
 

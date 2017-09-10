@@ -1,6 +1,6 @@
-package net.kb.test.xutils;
+package net.yui.app.xutils;
 
-import net.kb.test.bean.Parent;
+import net.yui.app.bean.Parent;
 import net.yui.testCase.XUtilsCase;
 
 import org.junit.Assert;

@@ -1,4 +1,4 @@
-package net.kb.test.greenDAO;
+package net.yui.app.greenDAO;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

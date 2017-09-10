@@ -27,7 +27,7 @@ public class ResourceCacheTest {
 
     @Test
     public void testGetIdTable() throws Exception {
-        String rClassName = "net.kb.test.library.R$string";
+        String rClassName = "net.yui.R$string";
 
         mResourceCache.cacheIdTable(rClassName, new HashMap<Integer, String>());
 

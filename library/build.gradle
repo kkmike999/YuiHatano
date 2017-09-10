@@ -37,7 +37,7 @@ dependencies {
 //    compile files('android-lib/android-all-7.1.0_r7-robolectric-0.jar')
 
     // 单元测试
-    compile 'org.robolectric:robolectric:3.2.2'
+    compile 'org.robolectric:robolectric:3.4.2'
     compile 'org.mockito:mockito-all:2.0.2-beta'
     //    compile group: 'org.mockito', name: 'mockito-core', version: '2.8.9'
     compile 'junit:junit:4.12'
@@ -62,7 +62,7 @@ publish {
     userOrg = 'kkmike999'      //bintray注册的用户名
     groupId = 'net.yui'         //compile引用时的第1部分groupId
     artifactId = 'yui'     //compile引用时的第2部分项目名
-    publishVersion = '1.0'    //compile引用时的第3部分版本号
+    publishVersion = '0.1'    //compile引用时的第3部分版本号
     desc = 'Android DAO单元测试框架'
     website = 'http://www.jianshu.com/u/0ef3dc77079c'
 }

@@ -1,4 +1,4 @@
-package net.kb.test.dbflow;
+package net.yui.app.dbflow;
 
 import com.raizlabs.android.dbflow.annotation.Database;
 

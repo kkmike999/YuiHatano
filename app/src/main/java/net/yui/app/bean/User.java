@@ -1,4 +1,4 @@
-package net.kb.test.bean;
+package net.yui.app.bean;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
