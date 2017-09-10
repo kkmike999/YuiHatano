@@ -39,7 +39,7 @@ dependencies {
 
 ## 使用方法
 
-### 原生SQLiteDatabase
+### SQLiteDatabase
 
 ```
 public class SQLiteDatabaseTest extends YuiCase {
