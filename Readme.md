@@ -9,7 +9,7 @@ YuiHatano支持原生SQLiteDatabase操作及GreenDAO、Afinal、XUtils、DbFlow�
 在module的**build.gradle**添加依赖：
 ```
 dependencies {
-    testCompile('net.yui:YuiHatano:1.0') {
+    testCompile('net.yui:YuiHatano:1.0.1') {
         exclude group: 'com.android.support'
     }
 }
