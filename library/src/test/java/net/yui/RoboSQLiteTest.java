@@ -4,11 +4,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import net.yui.utils.RoboRunner;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * Created by kkmike999 on 2017/06/01.
  */
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RoboRunner.class)
 @Config(constants = BuildConfig.class)
 public class RoboSQLiteTest {
 

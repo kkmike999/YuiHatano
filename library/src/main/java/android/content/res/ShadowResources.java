@@ -7,6 +7,7 @@ import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
+import net.yui.R;
 import net.yui.utils.FileReader;
 
 import org.jsoup.Jsoup;
@@ -159,6 +160,15 @@ public class ShadowResources {
         }
 
         String manifestPath = "build/intermediates/manifests/aapt/debug/AndroidManifest.xml";
+
+        // 当.../aapt/debug/目录不存在
+        if (!new File(manifestPath).exists()) {
+            manifestPath = "build/intermediates/manifests/aapt/release/AndroidManifest.xml";
+        }
+        // 当.../aapt/release/目录不存在
+        if (!new File(manifestPath).exists()) {
+            manifestPath = "build/intermediates/manifests/aapt/full/release/AndroidManifest.xml";
+        }
 
         FileReader reader = new FileReader();
 
