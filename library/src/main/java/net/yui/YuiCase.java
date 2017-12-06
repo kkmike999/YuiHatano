@@ -13,16 +13,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.DisplayMetrics;
 
 import net.yui.utils.DbPathUtils;
+import net.yui.utils.FileUtils;
 
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by kkmike999 on 2017/9/10.
- *
+ * <p>
  * YuiHatano单元测试Case
  */
 public class YuiCase {
@@ -80,6 +83,7 @@ public class YuiCase {
             dbMap.clear();
 
             deleteDbDir();
+            deleteDir();
         }
 
         /**
@@ -97,14 +101,18 @@ public class YuiCase {
          * 删除数据库
          */
         private void deleteDbDir() {
-            File   dbDir = new File(DbPathUtils.getDbDir());
-            File[] files = dbDir.listFiles();
+            File dbDir = new File(DbPathUtils.getDbDir());
+            FileUtils.deleteDir(dbDir);
+        }
 
-            if (files != null) {
-                for (File file : files) {
-                    file.delete();
-                }
-                dbDir.delete();
+        /**
+         * 临时生成的目录
+         */
+        private void deleteDir() {
+            List<File> dirs = Arrays.asList(mShadowContext.getFilesDir(), mShadowContext.getCacheDir(), mShadowContext.getDataDir());
+
+            for (File dir : dirs) {
+                FileUtils.deleteDir(dir);
             }
         }
     };

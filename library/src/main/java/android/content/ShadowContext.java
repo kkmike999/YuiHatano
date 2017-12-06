@@ -12,9 +12,9 @@ import android.shadow.Shadow;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
+import net.kkmike.sptest.SharedPreferencesHelper;
 import net.yui.CGLibProxy;
 import net.yui.utils.DbPathUtils;
-import net.kkmike.sptest.SharedPreferencesHelper;
 
 import java.io.File;
 import java.util.HashMap;
@@ -56,6 +56,29 @@ public class ShadowContext implements Shadow {
 
     public AssetManager getAssets() {
         return new CGLibProxy().proxy(AssetManager.class, new ShadowAssetManager());
+    }
+
+    //////////////////////////// file //////////////////////////
+    public File getFilesDir() {
+        return getAndCreateDir("build/files/");
+    }
+
+    public File getCacheDir() {
+        return getAndCreateDir("build/cache");
+    }
+
+    public File getDataDir() {
+        return getAndCreateDir("build/data");
+    }
+
+    private File getAndCreateDir(String dirPath) {
+        File dir = new File(dirPath);
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        return dir;
     }
 
     /////////////////////////////   SQLiteDatabase    /////////////////////////////
