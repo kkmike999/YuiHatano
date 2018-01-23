@@ -1,8 +1,11 @@
 package android.content.res;
 
 import android.content.res.Resources.NotFoundException;
+import android.graphics.Color;
 import android.support.annotation.ArrayRes;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
@@ -32,6 +35,7 @@ import java.util.Set;
 public class ShadowResources {
 
     private static final String R_STRING = "string";
+    private static final String R_COLOR  = "color";
     private static final String R_ARRAY  = "array";
 
     private String mPackageName = "";
@@ -43,6 +47,21 @@ public class ShadowResources {
     public ShadowResources() {
         this.mPackageName = getPackageName();
         this.mResourceCache = new ResourceCache();
+    }
+
+    public int getColor(@ColorRes int id) throws NotFoundException {
+        return getColor(id, null);
+    }
+
+    public int getColor(@ColorRes int id, @Nullable Resources.Theme theme) throws NotFoundException {
+        Map<Integer, String> colorValues = getResIdValueMap(R_COLOR);
+        String               colorHex    = colorValues.get(id);
+
+        if (colorHex != null) {
+            return Color.parseColor(colorHex);
+        }
+//        throw new Resources.NotFoundException("Color resource ID #0x" + Integer.toHexString(id));
+        return 0;
     }
 
     public String getString(@StringRes int id) throws NotFoundException {
@@ -60,7 +79,7 @@ public class ShadowResources {
 
     @NonNull
     public String[] getStringArray(@ArrayRes int id) throws NotFoundException {
-        Map<Integer, String>      idNameMap      = getArrayIdTable();
+        Map<Integer, String>      idNameMap      = getIdTable(R_ARRAY);
         Map<String, List<String>> stringArrayMap = getResourceStringArrayMap();
 
         if (idNameMap.containsKey(id)) {
@@ -77,7 +96,7 @@ public class ShadowResources {
 
     @NonNull
     public int[] getIntArray(@ArrayRes int id) throws NotFoundException {
-        Map<Integer, String>       idNameMap   = getArrayIdTable();
+        Map<Integer, String>       idNameMap   = getIdTable(R_ARRAY);
         Map<String, List<Integer>> intArrayMap = getResourceIntArrayMap();
 
         if (idNameMap.containsKey(id)) {
@@ -98,7 +117,7 @@ public class ShadowResources {
     }
 
     private CharSequence getResourceText(@StringRes int id) {
-        Map<Integer, String> idValueMap = getStringResIdValueMap();
+        Map<Integer, String> idValueMap = getResIdValueMap(R_STRING);
         return idValueMap.get(id);
     }
 
@@ -193,23 +212,27 @@ public class ShadowResources {
         }
     }
 
+    //////////////////////////////////////////////////////////////////
+
     /**
      * 获取 资源id-值 映射表
      *
+     * @param resName 颜色{@linkplain #R_COLOR}，字符串{@linkplain #R_STRING}，字符串数组{@linkplain #R_ARRAY}
+     *
      * @return
      */
-    protected Map<Integer, String> getStringResIdValueMap() {
-        Map<Integer, String> idTable      = getStringIdTable();
-        Map<String, String>  nameValueMap = getStringResNameAndValueMap();
+    protected Map<Integer, String> getResIdValueMap(String resName){
+        Map<Integer, String> idTable      = getIdTable(resName);
+        Map<String, String>  nameValueMap = getResNameAndValueMap(resName);
 
         Map<Integer, String> idValueMap = new HashMap<>();
         Set<Integer>         ids        = idTable.keySet();
 
         for (Integer id : ids) {
-            String resName = idTable.get(id);
+            String _resName = idTable.get(id);
 
-            if (nameValueMap.containsKey(resName)) {
-                String value = nameValueMap.get(resName);
+            if (nameValueMap.containsKey(_resName)) {
+                String value = nameValueMap.get(_resName);
 
                 idValueMap.put(id, value);
             }
@@ -219,18 +242,57 @@ public class ShadowResources {
     }
 
     /**
-     * 获取strings.xml 资源名-值 映射表
+     * 获取{@linkplain R.string}、{@linkplain R.color}、{@linkplain R.array}等 "资源id-资源名"映射表
+     *
+     * @param resName 颜色{@linkplain #R_COLOR}，字符串{@linkplain #R_STRING}，字符串数组{@linkplain #R_ARRAY}
+     *
+     * @return id - string name 映射表
+     */
+    protected Map<Integer, String> getIdTable(@RTypes String resName) {
+        try {
+            // R资源类全称
+            String rClassName = mPackageName + ".R$" + resName;
+
+            if (mResourceCache.hasIdTableCache(rClassName)) {
+                return mResourceCache.getIdTableCache(rClassName);
+            }
+
+            Class                stringRClass = Class.forName(rClassName);
+            Field[]              fields       = stringRClass.getDeclaredFields();
+            Map<Integer, String> idTable      = new HashMap<>();
+            for (Field field : fields) {
+                field.setAccessible(true);
+
+                int    id   = (int) field.get(null);
+                String name = field.getName();
+
+                idTable.put(id, name);
+            }
+
+            mResourceCache.cacheIdTable(rClassName, idTable);
+
+            return idTable;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new HashMap<>();
+    }
+
+    /**
+     * 获取colors.xml、strings.xml等 资源名-值 映射表
+     *
+     * @param resName 资源名：颜色{@linkplain #R_COLOR}，字符串{@linkplain #R_STRING}，字符串数组{@linkplain #R_ARRAY}
      *
      * @return
      */
-    protected Map<String, String> getStringResNameAndValueMap() {
+    protected Map<String, String> getResNameAndValueMap(String resName) {
         Map<String, String> map = new HashMap<>();
 
         Document document = getValuesXmlDocument();
-        Elements strings  = document.getElementsByTag("string");
+        Elements colors   = document.getElementsByTag(resName);
 
-        for (int i = 0; i < strings.size(); i++) {
-            Element element = strings.get(i);
+        for (int i = 0; i < colors.size(); i++) {
+            Element element = colors.get(i);
             String  name    = element.attr("name");
 
             if (element.childNodeSize() > 0 && element.childNode(0) instanceof TextNode) {
@@ -263,59 +325,6 @@ public class ShadowResources {
         return document;
     }
 
-    /**
-     * 获取{@linkplain R.string}"资源id-资源名"映射表
-     *
-     * @return id - string name 映射表
-     */
-    protected Map<Integer, String> getStringIdTable() {
-        try {
-            return getIdTable(R_STRING);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new HashMap<>();
-    }
-
-    /**
-     * 获取{@linkplain R.array}"资源id-资源名"映射表
-     *
-     * @return id - string name 映射表
-     */
-    protected Map<Integer, String> getArrayIdTable() {
-        try {
-            return getIdTable(R_ARRAY);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new HashMap<>();
-    }
-
-    protected Map<Integer, String> getIdTable(@RTypes String resName) throws IllegalAccessException, ClassNotFoundException {
-        // R资源类全称
-        String rClassName = mPackageName + ".R$" + resName;
-
-        if (mResourceCache.hasIdTableCache(rClassName)) {
-            return mResourceCache.getIdTableCache(rClassName);
-        }
-
-        Class                stringRClass = Class.forName(rClassName);
-        Field[]              fields       = stringRClass.getDeclaredFields();
-        Map<Integer, String> idTable      = new HashMap<>();
-        for (Field field : fields) {
-            field.setAccessible(true);
-
-            int    id   = (int) field.get(null);
-            String name = field.getName();
-
-            idTable.put(id, name);
-        }
-
-        mResourceCache.cacheIdTable(rClassName, idTable);
-
-        return idTable;
-    }
-
-    @StringDef({R_STRING, R_ARRAY})
+    @StringDef({R_STRING, R_ARRAY, R_COLOR})
     @interface RTypes {}
 }

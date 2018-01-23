@@ -1,5 +1,7 @@
 package android.content.res;
 
+import android.graphics.Color;
+
 import net.yui.R;
 
 import org.junit.Assert;
@@ -29,6 +31,14 @@ public class ShadowResourcesTest {
 
         Assert.assertEquals("item0", array[0]);
         Assert.assertEquals("item1", array[1]);
+    }
+
+    @Test
+    public void getColor() throws Exception {
+        int color     = resources.getColor(R.color.my_color);
+        int realColor = Color.parseColor("#47474d");
+
+        Assert.assertEquals(realColor, color);
     }
 
     @Test
