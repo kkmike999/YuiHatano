@@ -188,6 +188,10 @@ public class ShadowResources {
         if (!new File(manifestPath).exists()) {
             manifestPath = "build/intermediates/manifests/aapt/full/release/AndroidManifest.xml";
         }
+        // 当.../aapt/full/release/目录不存在
+        if (!new File(manifestPath).exists()) {
+            manifestPath = "build/intermediates/manifests/full/debug/AndroidManifest.xml";
+        }
 
         FileReader reader = new FileReader();
 

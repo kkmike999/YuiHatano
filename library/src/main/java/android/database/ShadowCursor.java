@@ -175,7 +175,14 @@ public class ShadowCursor implements Cursor {
     }
 
     private Object getObject(int columnIndex) {
-        return mDatas.get(mPosition).get(columnIndex);
+        if (mPosition >= 0 && mDatas.size() > mPosition) {
+            List<Object> list = mDatas.get(mPosition);
+
+            if (list.size() > columnIndex) {
+                return list.get(columnIndex);
+            }
+        }
+        return null;
     }
 
     @Override
