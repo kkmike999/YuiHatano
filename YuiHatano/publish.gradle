@@ -2,18 +2,22 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 // 参考 https://blog.csdn.net/linglongxin24/article/details/53415932
-
-def ext = project.ext
+repositories {
+    // 仓库地址
+    maven { url "https://dl.bintray.com/kkmike999/maven" }
+}
 
 // 项目主页
-def siteUrl = ext.siteUrl
+def siteUrl = 'https://github.com/kkmike999/YuiHatano' // 项目主页
 // 项目的版本控制地址
-def gitUrl = ext.gitUrl
+def gitUrl = 'https://github.com/kkmike999/YuiHatano.git' // 项目的版本控制地址
+def descript = 'Android DAO单元测试框架'
+def mArtifactId = project.name
 
-group = ext.groupId // 发布到组织名称名字，必须填写
-version = ext.version
+group = 'net.yui' // 发布到组织名称名字，必须填写
+version = '1.0.7'
 
-println("\ngroup=${group}, artifactId=${artifactId}, version=${version}\n")
+println("\ngroup=${group}, artifactId=${mArtifactId}, version=${version}\n")
 
 // 配置maven库，生成POM.xml文件
 install {
@@ -21,12 +25,14 @@ install {
         // This generates POM.xml with proper parameters
         pom {
             project {
-                name ext.artifactId
-                description ext.desc
+                name mArtifactId
+                description descript
                 url siteUrl
 
                 packaging 'aar'
-                artifactId ext.artifactId
+                artifactId mArtifactId
+
+                println("install.pom name=${mArtifactId}, artifactId=${artifactId}")
 
                 licenses {
                     license {
@@ -61,8 +67,8 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"  // 上传到中央仓库的名称
-        name = ext.artifactId // 发布到JCenter上的项目名字，必须填写
-        desc = ext.desc    //项目描述
+        name = mArtifactId // 发布到JCenter上的项目名字，必须填写
+        desc = descript    //项目描述
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]

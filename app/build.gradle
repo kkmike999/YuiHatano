@@ -36,7 +36,13 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
 
-    testImplementation project(':library')
+    testImplementation project(':YuiHatano')
+//    implementation('net.yui:YuiHatano:1.0.7') {
+//        transitive = true
+//
+//        exclude module: 'jsoup', group: 'org.jsoup'
+//        exclude module: 'support-annotations', group: 'com.android.support'
+//    }
 
 //    implementation 'org.greenrobot:greendao-generator:3.2.0'
     implementation 'org.greenrobot:greendao:3.2.0'
