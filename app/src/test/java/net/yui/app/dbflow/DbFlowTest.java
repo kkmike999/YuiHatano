@@ -1,7 +1,5 @@
 package net.yui.app.dbflow;
 
-import com.raizlabs.android.dbflow.config.FlowConfig;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.Method;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -15,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -24,8 +23,6 @@ public class DbFlowTest extends DbFlowCase {
 
     @Before
     public void setUp() throws Exception {
-        FlowManager.init(new FlowConfig.Builder(getApplication()).build());
-
         Assert.assertEquals(0, new Select(Method.count()).from(UserModel.class).count());
     }
 
@@ -65,6 +62,17 @@ public class DbFlowTest extends DbFlowCase {
                                .querySingle();
 
         Assert.assertEquals("李四", user.getName());
+    }
+
+    @Test
+    public void onSelect() {
+        save("张三");
+
+        List<UserModel> list = new Select().from(UserModel.class)
+                                           .where(UserModel_Table.name.like("张三"))
+                                           .queryList();
+
+        Assert.assertEquals("张三", list.get(0).getName());
     }
 
     private void save(String name) {

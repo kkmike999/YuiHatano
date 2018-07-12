@@ -1,28 +1,18 @@
 package net.yui.testCase;
 
-import net.kb.test.library.KBCase;
-import net.yui.dbflow.DbFlowUtils;
+import net.yui.YuiCase;
+import net.yui.testCase.rule.DbFlowRule;
 
 import org.junit.Rule;
-import org.junit.rules.ExternalResource;
+import org.junit.rules.TestRule;
 
 /**
  * Created by kkmike999 on 2017/06/13.
  * <p>
  * DbFlow Case
  */
-public class DbFlowCase extends KBCase {
+public class DbFlowCase extends YuiCase {
 
     @Rule
-    public ExternalResource innerRule = new ExternalResource() {
-        @Override
-        protected void before() throws Throwable {
-            DbFlowUtils.destroy();
-        }
-
-        @Override
-        protected void after() {
-            DbFlowUtils.destroy();
-        }
-    };
+    public TestRule innerRule = new DbFlowRule(this);
 }

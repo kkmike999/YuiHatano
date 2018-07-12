@@ -117,7 +117,7 @@ public class YuiCase {
         }
     };
 
-    protected Context getContext() {
+    public Context getContext() {
         return mContext;
     }
 

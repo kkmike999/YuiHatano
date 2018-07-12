@@ -1,0 +1,107 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+// 参考 https://blog.csdn.net/linglongxin24/article/details/53415932
+
+def ext = project.ext
+
+// 项目主页
+def siteUrl = ext.siteUrl
+// 项目的版本控制地址
+def gitUrl = ext.gitUrl
+
+group = ext.groupId // 发布到组织名称名字，必须填写
+version = ext.version
+
+println("\ngroup=${group}, artifactId=${artifactId}, version=${version}\n")
+
+// 配置maven库，生成POM.xml文件
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                name ext.artifactId
+                description ext.desc
+                url siteUrl
+
+                packaging 'aar'
+                artifactId ext.artifactId
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'kkmike999'
+                        name 'kkmike999'
+                        email 'kkmike999@163.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+//上传到jcenter
+bintray {
+    user = project.getProperties().get("bintray.user")
+    key = project.getProperties().get("bintray.apikey")
+
+    println("bintray user=${user}, key=${key}")
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"  // 上传到中央仓库的名称
+        name = ext.artifactId // 发布到JCenter上的项目名字，必须填写
+        desc = ext.desc    //项目描述
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
+
+/////////////////////////  辅助配置  /////////////////////////
+
+//生成源文件
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+//生成文档
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    options.encoding "UTF-8"
+    options.charSet 'UTF-8'
+    options.author true
+    options.version true
+    options.links "https://coding.net/u/kkmike999/p/bintray-release/git"
+    failOnError false
+}
+
+//文档打包成jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+//拷贝javadoc文件
+task copyDoc(type: Copy) {
+    from "${buildDir}/docs/"
+    into "docs"
+}
+
+// 上传到jcenter所需要的源码文件
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}

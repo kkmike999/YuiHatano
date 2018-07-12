@@ -247,8 +247,6 @@ public class DbFlowTest extends DbFlowCase {
 
     @Before
     public void setUp() throws Exception {
-        FlowManager.init(new FlowConfig.Builder(getApplication()).build());
-
         Assert.assertEquals(0, new Select(Method.count()).from(UserModel.class).count());
     }
 

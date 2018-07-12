@@ -1,1 +1,1 @@
-include ':app', ':library', ':bintray-release'
+include ':app', ':library'

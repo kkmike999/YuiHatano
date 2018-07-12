@@ -15,6 +15,10 @@ public class CursorWrapper {
         return mCursor.moveToFirst();
     }
 
+    public boolean moveToNext() {
+        return mCursor.moveToNext();
+    }
+
     public void close() {
     }
 }

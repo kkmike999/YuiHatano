@@ -1,5 +1,6 @@
 package net.yui.utils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -30,11 +31,20 @@ public class ReflectUtils {
         }
     }
 
-    public static Object invoke(Object receiver, String methodName, Object[] arguments) {
+    /**
+     * 执行方法
+     *
+     * @param receiver
+     * @param methodName
+     * @param arguments  传入参数
+     *
+     * @return
+     */
+    public static Object invoke(Object receiver, String methodName, Object... arguments) {
         try {
-            Class clazz = receiver.getClass();
-
-            Method method = findMethod(clazz, methodName, toTypes(arguments));
+            Class   clazz         = receiver.getClass();
+            Class[] argumentTypes = arguments == null || arguments.length == 0 ? new Class[0] : toTypes(arguments);
+            Method  method        = findMethod(clazz, methodName, argumentTypes);
 
             return method.invoke(receiver, arguments);
         } catch (Exception e) {
@@ -43,20 +53,64 @@ public class ReflectUtils {
         return null;
     }
 
-    public static Object invoke(Object receiver, String methodName) {
+    /**
+     * 执行静态方法
+     *
+     * @param className
+     * @param methodName
+     * @param arguments  参数
+     *
+     * @return
+     */
+    public static Object invokeStatic(String className, String methodName, Object... arguments) {
         try {
-            Class clazz = receiver.getClass();
+            Class clazz = Class.forName(className);
+            return invokeStatic(clazz, methodName, arguments);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-            Method method = findMethod(clazz, methodName, new Class[0]);
+    public static Object invokeStatic(Class clazz, String methodName, Object... arguments) {
+        try {
+            Class[] argumentTypes = arguments == null || arguments.length == 0 ? new Class[0] : toTypes(arguments);
+            Method  method        = findMethod(clazz, methodName, argumentTypes);
 
-            return method.invoke(receiver);
+            return method.invoke(null, arguments);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static Method findMethod(Class clazz, String methodName, Class[] argumentTypes) {
+    public static Object newObject(String className, Object... args) {
+        try {
+            Class       clazz       = Class.forName(className);
+            Class[]     argTypes    = args == null || args.length == 0 ? new Class[0] : toTypes(args);
+            Constructor constructor = clazz.getConstructor(argTypes);
+
+            return constructor.newInstance(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+//    public static Object invoke(Object receiver, String methodName) {
+//        try {
+//            Class clazz = receiver.getClass();
+//
+//            Method method = findMethod(clazz, methodName, new Class[0]);
+//
+//            return method.invoke(receiver);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
+    public static Method findMethod(Class clazz, String methodName, Class... argumentTypes) {
         while (!clazz.equals(Object.class)) {
             Method[] ms = clazz.getDeclaredMethods();
 
@@ -99,6 +153,20 @@ public class ReflectUtils {
 
         for (int i = 0; i < arguments.length; i++) {
             types[i] = arguments[i].getClass();
+
+            String name = types[i].getName();
+
+            // 处理cglib代理类
+            if (name.contains("$$EnhancerByCGLIB")) {
+                try {
+                    String readClassName = name.substring(0, name.indexOf("$$EnhancerByCGLIB"));
+                    Class  type          = Class.forName(readClassName);
+
+                    types[i] = type;
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return types;
     }

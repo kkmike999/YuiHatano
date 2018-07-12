@@ -1,6 +1,6 @@
 package net.yui.testCase;
 
-import net.kb.test.library.KBCase;
+import net.yui.YuiCase;
 import net.yui.xutils.XUtilsDbUtils;
 
 import org.junit.Rule;
@@ -10,7 +10,7 @@ import org.junit.rules.ExternalResource;
 /**
  * Created by kkmike999 on 2017/06/13.
  */
-public class XUtilsCase extends KBCase {
+public class XUtilsCase extends YuiCase {
 
     @Rule
     public ExternalResource xutilsRule = new ExternalResource() {
