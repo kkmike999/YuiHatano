@@ -15,7 +15,7 @@ def descript = 'Android DAO单元测试框架'
 def mArtifactId = project.name
 
 group = 'net.yui' // 发布到组织名称名字，必须填写
-version = '1.0.8'
+version = '1.0.10'
 
 println("\ngroup=${group}, artifactId=${mArtifactId}, version=${version}\n")
 

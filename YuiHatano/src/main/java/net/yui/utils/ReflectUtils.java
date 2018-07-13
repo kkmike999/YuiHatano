@@ -9,6 +9,15 @@ import java.lang.reflect.Method;
  */
 public class ReflectUtils {
 
+    public static boolean hasClass(String className) {
+        try {
+            Class.forName(className);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
     public static void setField(Object receiver, String fieldName, Object value) {
         Class clazz = receiver.getClass();
 

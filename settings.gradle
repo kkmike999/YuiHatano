@@ -1,1 +1,1 @@
-include ':app', ':YuiHatano'
+include ':app', ':YuiHatano', ':test.module'

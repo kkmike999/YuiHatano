@@ -18,12 +18,16 @@ public class DbFlowRule extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
-        DbFlowUtils.destroy();
-        DbFlowUtils.init(mYuiCase.getContext());
+        if (DbFlowUtils.isDependOnDbFlow()) {
+            DbFlowUtils.destroy();
+            DbFlowUtils.init(mYuiCase.getContext());
+        }
     }
 
     @Override
     protected void after() {
-        DbFlowUtils.destroy();
+        if (DbFlowUtils.isDependOnDbFlow()) {
+            DbFlowUtils.destroy();
+        }
     }
 }

@@ -13,9 +13,8 @@ repositories {
 }
 
 dependencies {
-    testCompile('net.yui:YuiHatano:1.0.8') {
+    testCompile('net.yui:YuiHatano:1.0.10') {
         exclude group: 'com.android.support'
-        exclude module: 'jsoup', group: 'org.jsoup'
     }
 }
 ```
