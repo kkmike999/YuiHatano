@@ -19,10 +19,13 @@ public class ShadowCursor implements Cursor {
     List<List<Object>> mDatas = new ArrayList<>();
 
     int mPosition = -1;
+    boolean isClosed;
+    Bundle  mBundle;
 
     public ShadowCursor(List<String> colums, List<List<Object>> datas) {
         this.mColums = new ArrayList<>(colums);
         this.mDatas = new ArrayList<>(datas);
+        this.mBundle = new Bundle();
     }
 
     @Override
@@ -48,12 +51,20 @@ public class ShadowCursor implements Cursor {
 
     @Override
     public boolean moveToFirst() {
+        if (mDatas.size() == 0) {
+            mPosition = -1;
+            return false;
+        }
         mPosition = 0;
         return true;
     }
 
     @Override
     public boolean moveToLast() {
+        if (mDatas.size() == 0) {
+            mPosition = -1;
+            return false;
+        }
         mPosition = mDatas.size() - 1;
         return true;
     }
@@ -202,12 +213,12 @@ public class ShadowCursor implements Cursor {
 
     @Override
     public void close() {
-
+        isClosed = true;
     }
 
     @Override
     public boolean isClosed() {
-        return false;
+        return isClosed;
     }
 
     @Override
@@ -247,12 +258,12 @@ public class ShadowCursor implements Cursor {
 
     @Override
     public void setExtras(Bundle extras) {
-
+        mBundle = extras;
     }
 
     @Override
     public Bundle getExtras() {
-        return null;
+        return mBundle;
     }
 
     @Override

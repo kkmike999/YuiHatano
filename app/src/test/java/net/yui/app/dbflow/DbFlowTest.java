@@ -75,6 +75,15 @@ public class DbFlowTest extends DbFlowCase {
         Assert.assertEquals("张三", list.get(0).getName());
     }
 
+    @Test
+    public void testSelectBefore() {
+        List<UserModel> list = new Select().from(UserModel.class)
+                                           .where(UserModel_Table.name.like("张三"))
+                                           .queryList();
+
+        Assert.assertEquals(0, list.size());
+    }
+
     private void save(String name) {
         UserModel people = new UserModel();
 

@@ -67,6 +67,7 @@ public class CGLibProxy implements MethodInterceptor {
      * 实现MethodInterceptor接口要重写的方法。
      * 回调方法
      */
+    @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         Class[] paramTypes = method.getParameterTypes();
 
