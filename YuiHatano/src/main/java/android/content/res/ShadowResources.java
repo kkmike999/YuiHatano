@@ -22,6 +22,7 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,19 +179,29 @@ public class ShadowResources {
             return mPackageName;
         }
 
-        String manifestPath = "build/intermediates/manifests/aapt/debug/AndroidManifest.xml";
+        String manifestPath = null;
 
-        // 当.../aapt/debug/目录不存在
-        if (!new File(manifestPath).exists()) {
-            manifestPath = "build/intermediates/manifests/aapt/release/AndroidManifest.xml";
+        // AndroidManifest.xml 可能目录
+        List<String> manifestPaths = Arrays.asList(
+                "build/intermediates/manifests/aapt/debug/AndroidManifest.xml",
+                "build/intermediates/manifests/aapt/release/AndroidManifest.xml",
+                "build/intermediates/manifests/aapt/full/release/AndroidManifest.xml",
+                "build/intermediates/manifests/full/debug/AndroidManifest.xml",
+                "build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml",
+                "build/intermediates/aapt_friendly_merged_manifests/release/processDebugManifest/aapt/AndroidManifest.xml",
+                "build/intermediates/merged_manifests/debug/processDebugManifest/merged/AndroidManifest.xml",
+                "build/intermediates/merged_manifests/release/processDebugManifest/merged/AndroidManifest.xml"
+        );
+
+        for (String path : manifestPaths) {
+            if (new File(path).exists()) {
+                manifestPath = path;
+                break;
+            }
         }
-        // 当.../aapt/release/目录不存在
-        if (!new File(manifestPath).exists()) {
-            manifestPath = "build/intermediates/manifests/aapt/full/release/AndroidManifest.xml";
-        }
-        // 当.../aapt/full/release/目录不存在
-        if (!new File(manifestPath).exists()) {
-            manifestPath = "build/intermediates/manifests/full/debug/AndroidManifest.xml";
+
+        if (manifestPath == null) {
+            throw new RuntimeException("没有找到AndroidManifest.xml");
         }
 
         FileReader reader = new FileReader();
@@ -225,7 +236,7 @@ public class ShadowResources {
      *
      * @return
      */
-    protected Map<Integer, String> getResIdValueMap(String resName){
+    protected Map<Integer, String> getResIdValueMap(String resName) {
         Map<Integer, String> idTable      = getIdTable(resName);
         Map<String, String>  nameValueMap = getResNameAndValueMap(resName);
 
