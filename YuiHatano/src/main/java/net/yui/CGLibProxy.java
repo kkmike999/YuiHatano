@@ -2,10 +2,11 @@ package net.yui;
 
 import android.shadow.Shadow;
 
-import net.yui.utils.ReflectUtils;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import net.yui.utils.ArgumentsUtils;
+import net.yui.utils.ReflectUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,9 +22,16 @@ public class CGLibProxy implements MethodInterceptor {
      * 创建代理实例
      *
      * @param shadowObject shadow类，调用proxy类方法时，实际是执行shadow类方法
+     *
      * @return
      */
     public <T> T proxy(Class<T> clazz, Object shadowObject) {
+        if (!ArgumentsUtils.hasNoArgumentsConstructor(clazz)) {
+            Class[]  argTypes = ArgumentsUtils.getConstructorsArgumensTypes(clazz);
+            Object[] args     = ArgumentsUtils.getArgumens(argTypes);
+            return proxy(clazz, shadowObject, argTypes, args);
+        }
+
         this.shadowObject = shadowObject;
 
         Enhancer enhancer = new Enhancer();
@@ -44,6 +52,7 @@ public class CGLibProxy implements MethodInterceptor {
      * 创建代理实例
      *
      * @param shadowObject shadow类，调用proxy类方法时，实际是执行shadow类方法
+     *
      * @return
      */
     public <T> T proxy(Class<T> clazz, Object shadowObject, Class[] argTypes, Object[] args) {

@@ -4,13 +4,10 @@ import android.app.Application;
 import android.app.ShadowApplication;
 import android.content.Context;
 import android.content.ShadowContext;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.ShadowResources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.DisplayMetrics;
 
 import net.yui.utils.DbPathUtils;
 import net.yui.utils.FileUtils;
@@ -53,7 +50,7 @@ public class YuiCase {
             createDbDir();
 
             ShadowResources shadowResources = new ShadowResources();
-            Resources       resources       = new CGLibProxy().proxy(Resources.class, shadowResources, new Class[]{AssetManager.class, DisplayMetrics.class, Configuration.class}, new Object[]{null, null, null});
+            Resources       resources       = new CGLibProxy().proxy(Resources.class, shadowResources);
             mShadowContext = new ShadowContext(resources);
 
             mContext = new CGLibProxy().proxy(Context.class, mShadowContext);

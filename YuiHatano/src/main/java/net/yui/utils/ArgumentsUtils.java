@@ -25,6 +25,34 @@ public class ArgumentsUtils {
     }
 
     /**
+     * 是否有 无参构造函数
+     *
+     * @param clazz
+     *
+     * @return
+     */
+    public static boolean hasNoArgumentsConstructor(Class clazz) {
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+
+        if (constructors == null || constructors.length == 0) {
+            return true;
+        }
+
+        boolean hasNoArguments = false;
+
+        for (Constructor constructor : constructors) {
+            Class[] types = constructor.getParameterTypes();
+
+            if (types == null || types.length == 0) {
+                hasNoArguments = true;
+                break;
+            }
+        }
+
+        return hasNoArguments;
+    }
+
+    /**
      * 根据参数类型，生成对象数组
      *
      * @param argTypes 参数类型数组

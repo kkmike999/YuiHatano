@@ -14,7 +14,6 @@ import android.support.annotation.StringRes;
 
 import net.kkmike.sptest.SharedPreferencesHelper;
 import net.yui.CGLibProxy;
-import net.yui.utils.ArgumentsUtils;
 import net.yui.utils.DbPathUtils;
 
 import java.io.File;
@@ -99,12 +98,9 @@ public class ShadowContext implements Shadow {
         // 创建数据库
         String path = DbPathUtils.getDbPath(name);
 
-        Class[]  argTypes = ArgumentsUtils.getConstructorsArgumensTypes(SQLiteDatabase.class);
-        Object[] args     = ArgumentsUtils.getArgumens(argTypes);
-
         // 不同api版本，构造函数参数不同
         ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
-        SQLiteDatabase       db  = new CGLibProxy().proxy(SQLiteDatabase.class, sdb, argTypes, args);
+        SQLiteDatabase       db  = new CGLibProxy().proxy(SQLiteDatabase.class, sdb);
 
         sdb.setMockDatabase(db);
 
