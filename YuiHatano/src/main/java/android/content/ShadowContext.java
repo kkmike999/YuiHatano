@@ -14,6 +14,7 @@ import android.support.annotation.StringRes;
 
 import net.kkmike.sptest.SharedPreferencesHelper;
 import net.yui.CGLibProxy;
+import net.yui.utils.ArgumentsUtils;
 import net.yui.utils.DbPathUtils;
 
 import java.io.File;
@@ -25,8 +26,8 @@ import java.util.Map;
  */
 public class ShadowContext implements Shadow {
 
-    private Resources resources;
-    private Context   mockContext;
+    private Resources                   resources;
+    private Context                     mockContext;
     private Map<String, SQLiteDatabase> dbMap = new HashMap<>();
 
     public ShadowContext(Resources resources) {
@@ -96,20 +97,20 @@ public class ShadowContext implements Shadow {
             return dbMap.get(name);
         }
         // 创建数据库
-        try {
-            String path = DbPathUtils.getDbPath(name);
+        String path = DbPathUtils.getDbPath(name);
 
-            ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
-            SQLiteDatabase       db  = new CGLibProxy().proxy(SQLiteDatabase.class, sdb);
+        Class[]  argTypes = ArgumentsUtils.getConstructorsArgumensTypes(SQLiteDatabase.class);
+        Object[] args     = ArgumentsUtils.getArgumens(argTypes);
 
-            sdb.setMockDatabase(db);
+        // 不同api版本，构造函数参数不同
+        ShadowSQLiteDatabase sdb = new ShadowSQLiteDatabase(path, 0, null);
+        SQLiteDatabase       db  = new CGLibProxy().proxy(SQLiteDatabase.class, sdb, argTypes, args);
 
-            putSQLiteDatabase(name, db);
+        sdb.setMockDatabase(db);
 
-            return db;
-        } catch (java.sql.SQLException e) {
-            throw new android.database.SQLException("", e);
-        }
+        putSQLiteDatabase(name, db);
+
+        return db;
     }
 
     public boolean deleteDatabase(String name) {

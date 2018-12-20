@@ -3,12 +3,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "28.0.0"
+    compileSdkVersion COMPILE_SDK_VERSION as int
+
     defaultConfig {
         applicationId "net.yui"
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion COMPILE_SDK_VERSION as int
         versionCode 1
         versionName "1.0"
     }
@@ -32,7 +32,7 @@ def dbflow_version = "4.2.4"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "com.android.support:appcompat-v7:${ANDROID_SUPPORT_VERSION}"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
 

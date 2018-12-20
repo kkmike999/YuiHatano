@@ -245,17 +245,31 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
 
     Connection mConnection;
 
-    @Deprecated
-    private ShadowSQLiteDatabase(String path, int openFlags, CursorFactory cursorFactory, DatabaseErrorHandler errorHandler) {
-        mCursorFactory = cursorFactory;
-        mErrorHandler = errorHandler != null ? errorHandler : new DefaultDatabaseErrorHandler();
-        mConfigurationLocked = new SQLiteDatabaseConfiguration(path, openFlags);
+    public ShadowSQLiteDatabase(String path, int openFlags, CursorFactory cursorFactory) {
+        this(path, openFlags, cursorFactory, null);
     }
 
-    public ShadowSQLiteDatabase(String path, int openFlags, CursorFactory cursorFactory) throws java.sql.SQLException {
+    public ShadowSQLiteDatabase(String path, int openFlags, CursorFactory cursorFactory, DatabaseErrorHandler errorHandler) {
+        this(path, openFlags, cursorFactory, errorHandler, 0, 0, 0L, "journalMode", "syncMode");
+    }
+
+    // api 28
+    @TargetApi(Build.VERSION_CODES.P)
+    public ShadowSQLiteDatabase(final String path, final int openFlags,
+                                CursorFactory cursorFactory, DatabaseErrorHandler errorHandler,
+                                int lookasideSlotSize, int lookasideSlotCount, long idleConnectionTimeoutMs,
+                                String journalMode, String syncMode) {
         mCursorFactory = cursorFactory;
+//        mErrorHandler = null;
+        mErrorHandler = errorHandler != null ? errorHandler : new DefaultDatabaseErrorHandler();
         mConfigurationLocked = new SQLiteDatabaseConfiguration(path, openFlags);
-        mErrorHandler = null;
+        mConfigurationLocked.lookasideSlotSize = lookasideSlotSize;
+        mConfigurationLocked.lookasideSlotCount = lookasideSlotCount;
+
+        long effectiveTimeoutMs = Long.MAX_VALUE;
+        mConfigurationLocked.idleConnectionTimeoutMs = effectiveTimeoutMs;
+        mConfigurationLocked.journalMode = journalMode;
+        mConfigurationLocked.syncMode = syncMode;
 
         File parent = new File(path).getParentFile();
 
@@ -263,8 +277,12 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
             parent.mkdirs();
         }
 
-        mConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
-        mConnection.setAutoCommit(false);
+        try {
+            mConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
+            mConnection.setAutoCommit(false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -327,6 +345,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * The default is true.
      *
      * @param lockingEnabled set to true to enable locks, false otherwise
+     *
      * @deprecated This method now does nothing.  Do not use.
      */
     @Deprecated
@@ -366,6 +385,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * that own them.
      *
      * @return The session, never null.
+     *
      * @throws IllegalStateException if the thread does not yet have a session and
      *                               the database is not open.
      */
@@ -388,6 +408,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * account whether the thread is acting on behalf of the UI.
      *
      * @param readOnly True if the connection should be read-only.
+     *
      * @return The connection flags.
      */
     int getThreadDefaultConnectionFlags(boolean readOnly) {
@@ -618,6 +639,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * </p>
      *
      * @return False.
+     *
      * @deprecated Always returns false.  Do not use this method.
      */
     @Deprecated
@@ -631,6 +653,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * returns a new transaction will have been created but not marked as successful.
      *
      * @return true if the transaction was yielded
+     *
      * @deprecated if the db is locked more than once (becuase of nested transactions) then the lock
      * will not be yielded. Use yieldIfContendedSafely instead.
      */
@@ -662,6 +685,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param sleepAfterYieldDelay if > 0, sleep this long before starting a new transaction if
      *                             the lock was actually yielded. This will allow other background threads to make some
      *                             more progress than they would if we started the transaction immediately.
+     *
      * @return true if the transaction was yielded
      */
     public boolean yieldIfContendedSafely(long sleepAfterYieldDelay) {
@@ -698,7 +722,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param factory an optional factory class that is called to instantiate a
      *                cursor when query is called, or null for default
      * @param flags   to control database access mode
+     *
      * @return the newly opened database
+     *
      * @throws SQLiteException if the database cannot be opened
      */
     public static ShadowSQLiteDatabase openDatabase(String path, CursorFactory factory, int flags) {
@@ -721,7 +747,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param flags        to control database access mode
      * @param errorHandler the {@link DatabaseErrorHandler} obj to be used to handle corruption
      *                     when sqlite reports database corruption
+     *
      * @return the newly opened database
+     *
      * @throws SQLiteException if the database cannot be opened
      */
     public static ShadowSQLiteDatabase openDatabase(String path, CursorFactory factory, int flags, DatabaseErrorHandler errorHandler) {
@@ -756,6 +784,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * that may have been created by the database engine.
      *
      * @param file The database file path.
+     *
      * @return True if the database was successfully deleted.
      */
     public static boolean deleteDatabase(File file) {
@@ -867,6 +896,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *
      * @param factory an optional factory class that is called to instantiate a
      *                cursor when query is called
+     *
      * @return a ShadowSQLiteDatabase object, or null if the database can't be created
      */
     public static ShadowSQLiteDatabase create(CursorFactory factory) {
@@ -934,6 +964,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * be set below the current size.
      *
      * @param numBytes the maximum database size, in bytes
+     *
      * @return the new maximum database size
      */
     public long setMaximumSize(long numBytes) {
@@ -974,6 +1005,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param table        the table to mark as syncable
      * @param deletedTable The deleted table that corresponds to the
      *                     syncable table
+     *
      * @deprecated This method no longer serves any useful purpose and has been deprecated.
      */
     @Deprecated
@@ -990,6 +1022,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param foreignKey  this is the column in table whose value is an _id in
      *                    updateTable
      * @param updateTable this is the table that will have its _sync_dirty
+     *
      * @deprecated This method no longer serves any useful purpose and has been deprecated.
      */
     @Deprecated
@@ -1000,6 +1033,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * Finds the name of the first table, which is editable.
      *
      * @param tables a list of tables
+     *
      * @return the first table listed
      */
     public static String findEditTable(String tables) {
@@ -1030,6 +1064,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *
      * @param sql The raw SQL statement, may contain ? for unknown values to be
      *            bound later.
+     *
      * @return A pre-compiled {@link SQLiteStatement} object. Note that
      * {@link SQLiteStatement}s are not synchronized, see the documentation for more details.
      */
@@ -1075,8 +1110,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                      default sort order, which may be unordered.
      * @param limit         Limits the number of rows returned by the query,
      *                      formatted as LIMIT clause. Passing null denotes no LIMIT clause.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
+     *
      * @see Cursor
      */
     public Cursor query(boolean distinct, String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy,
@@ -1114,8 +1151,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      *                           If the operation is canceled, then {@link OperationCanceledException} will be thrown
      *                           when the query is executed.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
+     *
      * @see Cursor
      */
     public Cursor query(boolean distinct, String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy,
@@ -1151,8 +1190,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                      default sort order, which may be unordered.
      * @param limit         Limits the number of rows returned by the query,
      *                      formatted as LIMIT clause. Passing null denotes no LIMIT clause.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
+     *
      * @see Cursor
      */
     public Cursor queryWithFactory(CursorFactory cursorFactory, boolean distinct, String table, String[] columns, String selection, String[] selectionArgs,
@@ -1191,8 +1232,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      *                           If the operation is canceled, then {@link OperationCanceledException} will be thrown
      *                           when the query is executed.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
+     *
      * @see Cursor
      */
     public Cursor queryWithFactory(CursorFactory cursorFactory, boolean distinct, String table, String[] columns, String selection, String[] selectionArgs,
@@ -1231,8 +1274,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param orderBy       How to order the rows, formatted as an SQL ORDER BY clause
      *                      (excluding the ORDER BY itself). Passing null will use the
      *                      default sort order, which may be unordered.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
+     *
      * @see Cursor
      */
     public Cursor query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
@@ -1266,8 +1311,10 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                      default sort order, which may be unordered.
      * @param limit         Limits the number of rows returned by the query,
      *                      formatted as LIMIT clause. Passing null denotes no LIMIT clause.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
+     *
      * @see Cursor
      */
     public Cursor query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy, String limit) {
@@ -1282,6 +1329,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param selectionArgs You may include ?s in where clause in the query,
      *                      which will be replaced by the values from selectionArgs. The
      *                      values will be bound as Strings.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
@@ -1299,6 +1347,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      *                           If the operation is canceled, then {@link OperationCanceledException} will be thrown
      *                           when the query is executed.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
@@ -1315,6 +1364,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                      which will be replaced by the values from selectionArgs. The
      *                      values will be bound as Strings.
      * @param editTable     the name of the first table, which is editable
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
@@ -1334,6 +1384,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      *                           If the operation is canceled, then {@link OperationCanceledException} will be thrown
      *                           when the query is executed.
+     *
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
@@ -1390,6 +1441,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param values         this map contains the initial column values for the
      *                       row. The keys should be the column names and the values the
      *                       column values
+     *
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     public long insert(String table, String nullColumnHack, ContentValues values) {
@@ -1415,7 +1467,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param values         this map contains the initial column values for the
      *                       row. The keys should be the column names and the values the
      *                       column values
+     *
      * @return the row ID of the newly inserted row, or -1 if an error occurred
+     *
      * @throws SQLException
      */
     public long insertOrThrow(String table, String nullColumnHack, ContentValues values) throws SQLException {
@@ -1435,6 +1489,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                       in the case where your <code>initialValues</code> is empty.
      * @param initialValues  this map contains the initial column values for
      *                       the row.
+     *
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     public long replace(String table, String nullColumnHack, ContentValues initialValues) {
@@ -1459,7 +1514,9 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                       in the case where your <code>initialValues</code> is empty.
      * @param initialValues  this map contains the initial column values for
      *                       the row. The key
+     *
      * @return the row ID of the newly inserted row, or -1 if an error occurred
+     *
      * @throws SQLException
      */
     public long replaceOrThrow(String table, String nullColumnHack, ContentValues initialValues) throws SQLException, java.sql.SQLException {
@@ -1481,6 +1538,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                          row. The keys should be the column names and the values the
      *                          column values
      * @param conflictAlgorithm for insert conflict resolver
+     *
      * @return the row ID of the newly inserted row OR <code>-1</code> if either the
      * input parameter <code>conflictAlgorithm</code> = {@link #CONFLICT_IGNORE}
      * or an error occurred.
@@ -1539,6 +1597,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * 获取该表行数
      *
      * @param table 表名
+     *
      * @return
      */
     public long getRows(String table) {
@@ -1563,6 +1622,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param whereArgs   You may include ?s in the where clause, which
      *                    will be replaced by the values from whereArgs. The values
      *                    will be bound as Strings.
+     *
      * @return the number of rows affected if a whereClause is passed in, 0
      * otherwise. To remove all rows and get a count pass "1" as the
      * whereClause.
@@ -1591,6 +1651,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param whereArgs   You may include ?s in the where clause, which
      *                    will be replaced by the values from whereArgs. The values
      *                    will be bound as Strings.
+     *
      * @return the number of rows affected
      */
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
@@ -1609,6 +1670,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *                          will be replaced by the values from whereArgs. The values
      *                          will be bound as Strings.
      * @param conflictAlgorithm for update conflict resolver
+     *
      * @return the number of rows affected
      */
     public int updateWithOnConflict(String table, ContentValues values, String whereClause, String[] whereArgs, int conflictAlgorithm) {
@@ -1680,6 +1742,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      *
      * @param sql the SQL statement to be executed. Multiple statements separated by semicolons are
      *            not supported.
+     *
      * @throws SQLException if the SQL string is invalid
      */
     public void execSQL(String sql) throws SQLException {
@@ -1727,6 +1790,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param sql      the SQL statement to be executed. Multiple statements separated by semicolons are
      *                 not supported.
      * @param bindArgs only byte[], String, Long and Double are supported in bindArgs.
+     *
      * @throws SQLException if the SQL string is invalid
      */
     public void execSQL(String sql, Object[] bindArgs) throws SQLException {
@@ -1776,6 +1840,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * @param cancellationSignal A signal to cancel the operation in progress, or null if none.
      *                           If the operation is canceled, then {@link OperationCanceledException} will be thrown
      *                           when the query is executed.
+     *
      * @throws SQLiteException if {@code sql} is invalid
      */
     public void validateSql(@NonNull String sql, @Nullable CancellationSignal cancellationSignal) {
@@ -1801,6 +1866,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * Returns true if the database is in-memory db.
      *
      * @return True if the database is in-memory.
+     *
      * @hide
      */
     public boolean isInMemoryDatabase() {
@@ -1824,6 +1890,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * Returns true if the new version code is greater than the current database version.
      *
      * @param newVersion The new version code.
+     *
      * @return True if the new version code is greater than the current database version.
      */
     public boolean needUpgrade(int newVersion) {
@@ -1846,6 +1913,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * the {@link #NO_LOCALIZED_COLLATORS} flag set or was opened read only.
      *
      * @param locale The new locale.
+     *
      * @throws SQLException if the locale could not be set.  The most common reason
      *                      for this is that there is no collator available for the locale you requested.
      *                      In this case the database remains unchanged.
@@ -1881,6 +1949,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * This method is thread-safe.
      *
      * @param cacheSize the size of the cache. can be (0 to {@link #MAX_SQL_CACHE_SIZE})
+     *
      * @throws IllegalStateException if input cacheSize > {@link #MAX_SQL_CACHE_SIZE}.
      */
     public void setMaxSqlCacheSize(int cacheSize) {
@@ -1928,6 +1997,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * </p>
      *
      * @param enable True to enable foreign key constraints, false to disable them.
+     *
      * @throws IllegalStateException if the are transactions is in progress
      *                               when this method is called.
      */
@@ -2016,6 +2086,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * </p>
      *
      * @return True if write-ahead logging is enabled.
+     *
      * @throws IllegalStateException if there are transactions in progress at the
      *                               time this method is called.  WAL mode can only be changed when there are no
      *                               transactions in progress.
@@ -2093,6 +2164,7 @@ public final class ShadowSQLiteDatabase extends SQLiteClosable {
      * Returns true if write-ahead logging has been enabled for this database.
      *
      * @return True if write-ahead logging has been enabled for this database.
+     *
      * @see #enableWriteAheadLogging
      * @see #ENABLE_WRITE_AHEAD_LOGGING
      */

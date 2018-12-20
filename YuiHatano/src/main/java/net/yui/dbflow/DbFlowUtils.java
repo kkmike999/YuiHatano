@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class DbFlowUtils {
 
+    public static boolean DEBUG = false;
+
     /**
      * 是否依赖了DbFlow
      *
@@ -41,7 +43,9 @@ public class DbFlowUtils {
             Object flowConfig = ReflectUtils.invoke(builder, "build");
             ReflectUtils.invokeStatic("com.raizlabs.android.dbflow.config.FlowManager", "init", flowConfig);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (DEBUG) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -53,7 +57,9 @@ public class DbFlowUtils {
 
             destroyMethod.invoke(null);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (DEBUG) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -80,7 +86,9 @@ public class DbFlowUtils {
                 ReflectUtils.invoke(builder, "addDatabaseHolder", holderClass);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (DEBUG) {
+                e.printStackTrace();
+            }
         }
     }
 }
