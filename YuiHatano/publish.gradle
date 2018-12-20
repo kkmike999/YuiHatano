@@ -1,4 +1,5 @@
 apply plugin: 'com.github.dcendents.android-maven'
+// https://github.com/bintray/gradle-bintray-plugin
 apply plugin: 'com.jfrog.bintray'
 
 // 参考 https://blog.csdn.net/linglongxin24/article/details/53415932
@@ -15,7 +16,7 @@ def descript = 'Android DAO单元测试框架'
 def mArtifactId = project.name
 
 group = 'net.yui' // 发布到组织名称名字，必须填写
-version = '1.1.0'
+version = '1.1.1'
 
 println("\ngroup=${group}, artifactId=${mArtifactId}, version=${version}\n")
 
