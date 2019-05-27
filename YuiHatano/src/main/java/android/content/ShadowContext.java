@@ -1,6 +1,7 @@
 package android.content;
 
 import android.annotation.TargetApi;
+import android.app.Application;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.ShadowAssetManager;
@@ -27,6 +28,7 @@ public class ShadowContext implements Shadow {
 
     private Resources                   resources;
     private Context                     mockContext;
+    private Application                 application;
     private Map<String, SQLiteDatabase> dbMap = new HashMap<>();
 
     public ShadowContext(Resources resources) {
@@ -47,7 +49,7 @@ public class ShadowContext implements Shadow {
     }
 
     public Context getApplicationContext() {
-        return mockContext;
+        return application == null ? mockContext : application;
     }
 
     public File getDatabasePath(String name) {
@@ -111,7 +113,7 @@ public class ShadowContext implements Shadow {
 
     public boolean deleteDatabase(String name) {
         SQLiteDatabase db = dbMap.get(name);
-//        db.execSQL("DROP DATABASE " + name);
+        //        db.execSQL("DROP DATABASE " + name);
         db.close();
 
         String path = DbPathUtils.getDbPath(name);
@@ -135,5 +137,9 @@ public class ShadowContext implements Shadow {
     @Override
     public void setProxyObject(Object proxyObject) {
         mockContext = (Context) proxyObject;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 }

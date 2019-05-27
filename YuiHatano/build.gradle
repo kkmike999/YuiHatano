@@ -18,6 +18,14 @@ android {
 
     lintOptions {
         abortOnError false
+
+        // 如果为true，只报告错误，忽略警告
+        ignoreWarnings true
+
+        // 设定为true 使得所有release构建都会运行lint检查，层级为fatal，
+        // 一旦有致命问题被发现，将终止构建
+        // release时把这句去掉
+        checkReleaseBuilds false
     }
 
     sourceSets {

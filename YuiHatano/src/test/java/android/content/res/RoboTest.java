@@ -14,8 +14,6 @@ import org.robolectric.annotation.internal.DoNotInstrument;
 
 /**
  * Created by kkmike999 on 2017/05/26.
- * <p>
- * manifest = "build/intermediates/manifests/aapt/debug/AndroidManifest.xml"
  */
 @RunWith(RoboRunner.class)
 @Config(constants = BuildConfig.class)

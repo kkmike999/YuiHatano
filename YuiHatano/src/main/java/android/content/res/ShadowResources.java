@@ -61,7 +61,7 @@ public class ShadowResources {
         if (colorHex != null) {
             return Color.parseColor(colorHex);
         }
-//        throw new Resources.NotFoundException("Color resource ID #0x" + Integer.toHexString(id));
+        //        throw new Resources.NotFoundException("Color resource ID #0x" + Integer.toHexString(id));
         return 0;
     }
 
@@ -181,7 +181,7 @@ public class ShadowResources {
 
         String manifestPath = null;
 
-        // AndroidManifest.xml 可能目录
+        // AndroidManifest.xml 可能目录（不同gradle版本，不同目录，蛋疼）
         List<String> manifestPaths = Arrays.asList(
                 "build/intermediates/manifests/aapt/debug/AndroidManifest.xml",
                 "build/intermediates/manifests/aapt/release/AndroidManifest.xml",
@@ -190,17 +190,19 @@ public class ShadowResources {
                 "build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml",
                 "build/intermediates/aapt_friendly_merged_manifests/release/processDebugManifest/aapt/AndroidManifest.xml",
                 "build/intermediates/merged_manifests/debug/processDebugManifest/merged/AndroidManifest.xml",
-                "build/intermediates/merged_manifests/release/processDebugManifest/merged/AndroidManifest.xml"
+                "build/intermediates/merged_manifests/release/processDebugManifest/merged/AndroidManifest.xml",
+                "build/intermediates/merged_manifests/debug/AndroidManifest.xml",
+                "build/intermediates/library_manifest/debug/AndroidManifest.xml",
+                "build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml"
         );
 
-        for (String path : manifestPaths) {
-            if (new File(path).exists()) {
-                manifestPath = path;
-                break;
-            }
+        manifestPath = findExistPath(manifestPaths);
+
+        if (TextUtils.isEmpty(manifestPath)) {
+            manifestPath = findPath("AndroidManifest.xml", "build/intermediates");
         }
 
-        if (manifestPath == null) {
+        if (TextUtils.isEmpty(manifestPath)) {
             throw new RuntimeException("没有找到AndroidManifest.xml");
         }
 
@@ -326,7 +328,16 @@ public class ShadowResources {
      * @return
      */
     private Document getValuesXmlDocument() {
-        String path         = "build/intermediates/res/merged/debug/values/values.xml";
+        String path = findExistPath(Arrays.asList(
+                "build/intermediates/res/merged/debug/values/values.xml",
+                "build/intermediates/packaged_res/debug/values/values.xml",
+                "build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
+                "build/intermediates/incremental/packageDebugResources/merged.dir/values/values.xml"));
+
+        if (TextUtils.isEmpty(path)) {
+            path = findPath("values.xml", "build/intermediates");
+        }
+
         String absolutePath = new File(path).getAbsolutePath();
 
         if (mResourceCache.hasValuesDocumentCache(absolutePath)) {
@@ -342,4 +353,47 @@ public class ShadowResources {
 
     @StringDef({R_STRING, R_ARRAY, R_COLOR})
     @interface RTypes {}
+
+    /**
+     * 找到文件存在的路径
+     *
+     * @param paths
+     *
+     * @return
+     */
+    private String findExistPath(List<String> paths) {
+        for (String path : paths) {
+            if (new File(path).exists()) {
+                return path;
+            }
+        }
+        return "";
+    }
+
+    private String findPath(String name, String dir) {
+        File file = findFile(name, dir);
+
+        if (file.exists()) {
+            return file.getPath();
+        }
+        return "";
+    }
+
+    private File findFile(String name, String dir) {
+        File[] files = new File(dir).listFiles();
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                File f = findFile(name, file.getPath());
+                if (f != null) {
+                    return f;
+                }
+                continue;
+            }
+            if (file.getName().equals(name)) {
+                return file;
+            }
+        }
+        return null;
+    }
 }

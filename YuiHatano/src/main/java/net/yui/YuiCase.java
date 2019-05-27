@@ -58,6 +58,8 @@ public class YuiCase {
             // application
             ShadowApplication shadowApplication = new ShadowApplication(resources);
             mApplication = new CGLibProxy().proxy(Application.class, shadowApplication);
+
+            mShadowContext.setApplication(mApplication);
         }
 
         @Override
