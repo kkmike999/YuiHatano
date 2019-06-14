@@ -269,7 +269,7 @@ public class DbFlowTest extends DbFlowCase {
 
 ### Native方法测试
 
-（目前仅支持MacOS）
+（目前仅支持MacOS，并且测试的module有cpp源文件）
 
 示例目录结构：
 ```shell
