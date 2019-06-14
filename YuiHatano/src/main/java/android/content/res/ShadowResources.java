@@ -43,8 +43,6 @@ public class ShadowResources {
 
     ResourceCache mResourceCache;
 
-    private Document mValuesDocument;
-
     public ShadowResources() {
         this.mPackageName = getPackageName();
         this.mResourceCache = new ResourceCache();
@@ -332,7 +330,8 @@ public class ShadowResources {
                 "build/intermediates/res/merged/debug/values/values.xml",
                 "build/intermediates/packaged_res/debug/values/values.xml",
                 "build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
-                "build/intermediates/incremental/packageDebugResources/merged.dir/values/values.xml"));
+                "build/intermediates/incremental/packageDebugResources/merged.dir/values/values.xml",
+                "build/intermediates/incremental/mergeDebugResources/merged.dir/merger.xml"));
 
         if (TextUtils.isEmpty(path)) {
             path = findPath("values.xml", "build/intermediates");

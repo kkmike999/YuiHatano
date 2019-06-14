@@ -62,7 +62,7 @@ dependencies {
     api group: 'cglib', name: 'cglib', version: '3.2.5'
 
     testImplementation group: 'org.javassist', name: 'javassist', version: '3.21.0-GA'
-    testImplementation group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
 }
 
 apply from: 'publish.gradle'

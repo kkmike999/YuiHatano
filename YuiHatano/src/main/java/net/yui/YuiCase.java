@@ -51,7 +51,7 @@ public class YuiCase {
 
             ShadowResources shadowResources = new ShadowResources();
             Resources       resources       = new CGLibProxy().proxy(Resources.class, shadowResources);
-            mShadowContext = new ShadowContext(resources);
+            mShadowContext = new ShadowContext(resources, shadowResources);
 
             mContext = new CGLibProxy().proxy(Context.class, mShadowContext);
 

@@ -11,6 +11,8 @@ android {
         targetSdkVersion COMPILE_SDK_VERSION as int
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -21,6 +23,12 @@ android {
 
     lintOptions {
         abortOnError false
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
     }
 }
 
@@ -35,6 +43,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${ANDROID_SUPPORT_VERSION}"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
+
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 
     testImplementation project(':YuiHatano')
 //    implementation('net.yui:YuiHatano:1.0.7') {

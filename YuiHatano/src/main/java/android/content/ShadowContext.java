@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.ShadowAssetManager;
+import android.content.res.ShadowResources;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.ShadowSQLiteDatabase;
@@ -27,12 +28,18 @@ import java.util.Map;
 public class ShadowContext implements Shadow {
 
     private Resources                   resources;
+    private ShadowResources             mShadowResources;
     private Context                     mockContext;
     private Application                 application;
     private Map<String, SQLiteDatabase> dbMap = new HashMap<>();
 
     public ShadowContext(Resources resources) {
         this.resources = resources;
+    }
+
+    public ShadowContext(Resources resources, ShadowResources shadowResources) {
+        this.resources = resources;
+        this.mShadowResources = shadowResources;
     }
 
     @NonNull
@@ -58,6 +65,10 @@ public class ShadowContext implements Shadow {
 
     public AssetManager getAssets() {
         return new CGLibProxy().proxy(AssetManager.class, new ShadowAssetManager());
+    }
+
+    public String getPackageName() {
+        return mShadowResources == null ? "" : mShadowResources.getPackageName();
     }
 
     //////////////////////////// file //////////////////////////

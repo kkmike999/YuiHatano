@@ -7,13 +7,13 @@ YuiHatano支持原生SQLiteDatabase操作及GreenDAO、Afinal、XUtils、DbFlow�
 ## 引用
 
 在module的**build.gradle**添加依赖：
-```
+```groovy
 repositories {
     maven { url "https://dl.bintray.com/kkmike999/maven" }
 }
 
 dependencies {
-    testCompile('net.yui:YuiHatano:1.1.1') {
+    testImplementation('net.yui:YuiHatano:1.1.3') {
         exclude group: 'com.android.support'
     }
 }
@@ -34,7 +34,7 @@ dependencies {
 
 ### SQLiteDatabase
 
-```
+```java
 public class SQLiteDatabaseTest extends YuiCase {
 
     SQLiteDatabase db;
@@ -59,7 +59,7 @@ public class SQLiteDatabaseTest extends YuiCase {
 [GreenDAO github](https://github.com/greenrobot/greenDAO)
 
 User：
-```
+```java
 @Entity
 public class User {
 
@@ -80,7 +80,7 @@ public class User {
 ```
 
 单元测试：
-```
+```java
 public class GreenDAOTest extends GreenDAOCase {
 
     private DaoSession mDaoSession;
@@ -129,7 +129,7 @@ public class GreenDAOTest extends GreenDAOCase {
 [AFinal Github](https://github.com/yangfuhai/afinal)
 
 单元测试：
-```
+```java
 public class AfinalTest extends AFinalCase {
 
     FinalDb finalDb;
@@ -159,7 +159,7 @@ public class AfinalTest extends AFinalCase {
 
 [XUtils3 Github](https://github.com/wyouflf/xUtils3)
 
-```
+```java
 @Table(name = "Parent")
 public class Parent {
 
@@ -172,7 +172,7 @@ public class Parent {
 ```
 
 单元测试：
-```
+```java
 public class XUtilsTest extends XUtilsCase {
 
     protected DbManager db;
@@ -223,7 +223,7 @@ public class XUtilsTest extends XUtilsCase {
 
 DbFlow gradle配置，自行查阅：[DbFlow中文教程]( https://yumenokanata.gitbooks.io/dbflow-tutorials/content/index.html)。
 
-```
+```java
 @Table(database = DBFlowDatabase.class)
 public class UserModel extends BaseModel {
     //自增ID
@@ -246,7 +246,7 @@ public class UserModel extends BaseModel {
 ```
 
 单元测试：
-```
+```java
 public class DbFlowTest extends DbFlowCase {
 
     @Before
@@ -267,6 +267,54 @@ public class DbFlowTest extends DbFlowCase {
 }
 ```
 
+### Native方法测试
+
+（目前仅支持MacOS）
+
+示例目录结构：
+```shell
+./app/
+└── src
+    ├── main
+    │   ├── cpp
+    │   │   ├── CMakeLists.txt
+    │   │   └── jni.cpp
+    │   ├── java
+    │   │   └── net
+    │   │       └── yui
+    │   │           └── app
+    │   │               ├── JNI.java
+    └── test
+        └── java
+            └── net
+                └── yui
+                    └── app
+                        ├── jni
+                        │   └── TestJNI.java
+```
+
+含有native方法的`JNI`:
+```java
+public class JNI {
+    public native int add(int a, int b);
+}
+```
+
+测试用例继承`JNICase`，其他代码照常：
+```java
+public class TestJNI extends JNICase {
+
+    static {
+        System.loadLibrary("jni");
+    }
+
+    @Test
+    public void testJNI() {
+        JNI jni = new JNI();
+        Assert.assertEquals(2, jni.add(1, 1));
+    }
+}
+```
 
 
 
