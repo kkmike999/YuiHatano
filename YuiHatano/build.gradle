@@ -63,6 +63,11 @@ dependencies {
 
     testImplementation group: 'org.javassist', name: 'javassist', version: '3.21.0-GA'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+
+    // 仅编译时引用
+    def dbflow_version = "4.2.4"
+    provided "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    provided "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
 }
 
 apply from: 'publish.gradle'
