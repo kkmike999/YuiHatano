@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation('net.yui:YuiHatano:1.1.5') {
+    testImplementation('net.yui:YuiHatano:1.1.6') {
         exclude group: 'com.android.support'
     }
 }
