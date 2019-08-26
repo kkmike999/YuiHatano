@@ -3,7 +3,7 @@ package net.yui.app.greenDAO;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.kb.test.library.KBCase;
+import net.yui.YuiCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * Created by kkmike999 on 2017/06/09.
  */
-public class GreenDAOSqlTest extends KBCase {
+public class GreenDAOSqlTest extends YuiCase {
 
     SQLiteDatabase database;
 
