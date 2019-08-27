@@ -74,6 +74,7 @@ public class KbSqlParser {
      *
      * @param expression 表达快
      * @param iterator   绑定数据 迭代器
+     *
      * @return
      */
     protected static void bindExpressionArgs(Expression expression, Iterator<Object> iterator) {
@@ -202,6 +203,7 @@ public class KbSqlParser {
      * 获取表达式中，绑定变量数量
      *
      * @param expression 表达式应该包含{@linkplain JdbcParameter}
+     *
      * @return
      */
     protected static int getBindArgsCount(Expression expression) {
@@ -273,6 +275,7 @@ public class KbSqlParser {
      * 找到所有绑定变量
      *
      * @param sql
+     *
      * @return
      */
     protected static Set<Expression> findBindArgsExpressions(String sql) {
@@ -298,6 +301,7 @@ public class KbSqlParser {
      * 查找包含'?'的表达块（绑定变量）
      *
      * @param statement
+     *
      * @return
      */
     protected static Set<Expression> findBindArgsExpressions(Statement statement) {
@@ -358,6 +362,7 @@ public class KbSqlParser {
      *
      * @param expression
      * @param expressionSet
+     *
      * @return
      */
     private static Set<Expression> findBindArgsExpressions(Expression expression, Set<Expression> expressionSet) {
@@ -432,6 +437,8 @@ public class KbSqlParser {
     private static Expression parseToValue(Object arg) {
         if (arg instanceof Long || arg instanceof Integer) {
             return new LongValue(arg.toString());
+        } else if (arg instanceof Boolean) {
+            return new LongValue((Boolean) arg ? 1 : 0);// Android SQLite会将类型为NUMERIC转成INTEGER https://www.runoob.com/sqlite/sqlite-data-types.html
         } else if (arg instanceof Double || arg instanceof Float) {
             return new DoubleValue(arg.toString());
         }

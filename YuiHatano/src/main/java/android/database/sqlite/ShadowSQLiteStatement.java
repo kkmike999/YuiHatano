@@ -164,6 +164,7 @@ public final class ShadowSQLiteStatement extends ShadowSQLiteProgram {
                 KbSqlParserManager                    sqlManager = new KbSqlParserManager();
                 net.sf.jsqlparser.statement.Statement stm        = sqlManager.parse(sql);
 
+                // Android SQLite会将类型为NUMERIC转成INTEGER https://www.runoob.com/sqlite/sqlite-data-types.html
                 sql = KbSqlParser.bindArgs(sql, bindArgs);
 
                 debug(sql);

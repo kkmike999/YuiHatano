@@ -18,7 +18,7 @@ public class ShadowCursor implements Cursor {
     // query结果集合
     List<List<Object>> mDatas = new ArrayList<>();
 
-    int mPosition = -1;
+    int     mPosition = -1;
     boolean isClosed;
     Bundle  mBundle;
 
@@ -136,7 +136,8 @@ public class ShadowCursor implements Cursor {
 
     @Override
     public String getString(int columnIndex) {
-        return getObject(columnIndex).toString();
+        Object value = getObject(columnIndex);
+        return value == null ? null : value.toString();
     }
 
     @Override
@@ -146,27 +147,27 @@ public class ShadowCursor implements Cursor {
 
     @Override
     public short getShort(int columnIndex) {
-        return Short.valueOf(getObject(columnIndex).toString());
+        return Short.valueOf(getObject(columnIndex, 0).toString());
     }
 
     @Override
     public int getInt(int columnIndex) {
-        return Integer.valueOf(getObject(columnIndex).toString());
+        return Integer.valueOf(getObject(columnIndex, 0).toString());
     }
 
     @Override
     public long getLong(int columnIndex) {
-        return Long.valueOf(getObject(columnIndex).toString());
+        return Long.valueOf(getObject(columnIndex, 0).toString());
     }
 
     @Override
     public float getFloat(int columnIndex) {
-        return Float.valueOf(getObject(columnIndex).toString());
+        return Float.valueOf(getObject(columnIndex, 0f).toString());
     }
 
     @Override
     public double getDouble(int columnIndex) {
-        return Double.valueOf(getObject(columnIndex).toString());
+        return Double.valueOf(getObject(columnIndex, 0d).toString());
     }
 
     @Override
@@ -185,7 +186,16 @@ public class ShadowCursor implements Cursor {
         return FIELD_TYPE_STRING;
     }
 
-    private Object getObject(int columnIndex) {
+    protected Object getObject(int columnIndex, Object defaultValue) {
+        Object value = getObject(columnIndex);
+
+        if (value == null) {
+            return defaultValue;
+        }
+        return value;
+    }
+
+    protected Object getObject(int columnIndex) {
         if (mPosition >= 0 && mDatas.size() > mPosition) {
             List<Object> list = mDatas.get(mPosition);
 
