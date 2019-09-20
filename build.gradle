@@ -3,11 +3,11 @@
 buildscript {
     repositories {
         google()
-        maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
         jcenter()
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.5.0'
 
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2' // add plugin
 
@@ -22,10 +22,10 @@ buildscript {
 allprojects {
     repositories {
         google()
-        maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
-        maven { url "https://dl.bintray.com/kkmike999/maven" }
         jcenter()
         mavenCentral()
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
+        maven { url "https://dl.bintray.com/kkmike999/maven" }
         maven { url "https://jitpack.io" }
     }
 }
