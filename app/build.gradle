@@ -13,6 +13,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk { abiFilters "armeabi-v7a" }
     }
     buildTypes {
         release {
@@ -62,4 +64,10 @@ dependencies {
     annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
     implementation "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
     implementation "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+
+    // Blankj/AndroidUtilCode 好多现成的工具类 https://github.com/Blankj/AndroidUtilCode/blob/master/lib/utilcode/README-CN.md
+    implementation('com.blankj:utilcode:1.28.0') {
+        transitive = true
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
 }
