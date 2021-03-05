@@ -84,6 +84,14 @@ public class ShadowContext implements Shadow {
         return getAndCreateDir("build/data");
     }
 
+    public File getExternalCacheDir() {
+        return getAndCreateDir("build/external/cache");
+    }
+
+    public File getExternalFilesDir(String type) {
+        return getAndCreateDir("build/external/files/" + type);
+    }
+
     private File getAndCreateDir(String dirPath) {
         File dir = new File(dirPath);
 
