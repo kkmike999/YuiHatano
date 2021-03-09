@@ -47,7 +47,8 @@ dependencies {
     api 'org.mockito:mockito-all:2.0.2-beta'
     //    compile group: 'org.mockito', name: 'mockito-core', version: '2.8.9'
     api 'junit:junit:4.12'
-    api 'org.json:org.json:2.0'
+    //noinspection DuplicatePlatformClasses
+    api group: 'org.json', name: 'json', version: '20200518'
     api 'net.javacrumbs.json-unit:json-unit:1.16.0'
     api 'org.jsoup:jsoup:1.10.2'
     api('net.kkmike.sptest:sptest:0.5') {
